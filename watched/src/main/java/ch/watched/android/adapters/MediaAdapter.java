@@ -5,8 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import ch.watched.android.R;
+import android.widget.RelativeLayout;
+import ch.watched.android.database.DatabaseService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,15 +19,15 @@ import java.util.List;
 public class MediaAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
-    private List<MediaInflater> medias;
+    private List<Media> medias;
 
-    public MediaAdapter(Context context, List<MediaInflater> medias) {
+    public MediaAdapter(Context context, List<Media> medias) {
         this.inflater = LayoutInflater.from(context);
         this.medias = medias;
     }
 
     public MediaAdapter(Context context) {
-        this(context, new ArrayList<MediaInflater>());
+        this(context, new ArrayList<Media>());
     }
 
     @Override
@@ -42,20 +42,21 @@ public class MediaAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return i;
+        return medias.get(i).getID();
     }
 
     @Override
     public View getView(int i, View view, ViewGroup parent) {
 
-        LinearLayout layout;
+        Media media = medias.get(i);
+
+        RelativeLayout layout;
         if (view == null) {
-            layout = (LinearLayout) inflater.inflate(R.layout.search_item_movie, parent, false);
+            layout = (RelativeLayout) inflater.inflate(media.getLayoutID(), parent, false);
         } else {
-            layout = (LinearLayout) view;
+            layout = (RelativeLayout) view;
         }
 
-        MediaInflater media = medias.get(i);
         return media.inflate(layout);
     }
 
@@ -64,7 +65,7 @@ public class MediaAdapter extends BaseAdapter {
         notifyDataSetInvalidated();
     }
 
-    public void addAll(Collection<MediaInflater> medias) {
+    public void addAll(Collection<Media> medias) {
         this.medias.addAll(medias);
         notifyDataSetChanged();
     }

@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="ch.watched.android.activity.ActivityTV">
+
+    <item
+        android:id="@+id/switch_minimize"
+        android:title="Minimize"
+        app:actionViewClass="android.widget.Switch"
+        app:showAsAction="ifRoom"/>
+</menu>

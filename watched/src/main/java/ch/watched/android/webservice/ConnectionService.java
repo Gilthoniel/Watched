@@ -1,5 +1,6 @@
 package ch.watched.android.webservice;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -123,9 +124,7 @@ public class ConnectionService {
         @Override
         protected void onPostExecute(Bitmap result) {
 
-            if (result == null) {
-                view.setImageResource(android.R.drawable.ic_menu_report_image);
-            } else {
+            if (result != null) {
                 view.setImageBitmap(result);
             }
         }

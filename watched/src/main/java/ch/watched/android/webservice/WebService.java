@@ -1,19 +1,17 @@
 package ch.watched.android.webservice;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
-import android.util.LruCache;
 import android.widget.ImageView;
 import ch.watched.android.activity.SearchActivity;
-import ch.watched.android.adapters.MediaInflater;
-import ch.watched.android.models.Movie;
-import ch.watched.android.models.MovieDBConfiguration;
-import ch.watched.android.models.Serie;
+import ch.watched.android.adapters.Media;
+import ch.watched.android.database.DatabaseService;
+import ch.watched.android.models.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -42,6 +40,8 @@ public class WebService {
             builder.appendEncodedPath(url);
 
             service.getImage(builder, view);
+        } else {
+            Log.e("-- CONF --", "Conf for MovieDB is null");
         }
     }
 
@@ -76,11 +76,71 @@ public class WebService {
                 if (type.equals("movie")) {
                     classToken = new TypeToken<List<Movie>>(){}.getType();
                 } else {
-                    classToken = new TypeToken<List<Serie>>(){}.getType();
+                    classToken = new TypeToken<List<SearchTV>>(){}.getType();
                 }
 
-                List<MediaInflater> movies = gson.fromJson(json.get("results"), classToken);
+                List<Media> movies = gson.fromJson(json.get("results"), classToken);
                 fragment.setMedias(movies);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e("-- WebService --", "Result in a failure");
+            }
+        };
+
+        service.get(builder, callback);
+    }
+
+    public static void insertTV(final int id) {
+        Uri.Builder builder = getBuilder();
+        builder.appendEncodedPath("tv/" + id);
+
+        Callback callback = new Callback() {
+            @Override
+            public void onSuccess(JsonObject json) {
+
+                // Insert the TV Show
+                TV tvShow = gson.fromJson(json, TV.class);
+                DatabaseService.getInstance().insert(tvShow);
+
+                // Insert the episodes
+                JsonArray seasons = json.get("seasons").getAsJsonArray();
+                Iterator<JsonElement> it = seasons.iterator();
+                while (it.hasNext()) {
+                    JsonElement element = it.next();
+                    int number = element.getAsJsonObject().get("season_number").getAsInt();
+
+                    WebService.insertSeason(id, number);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e("-- WebService --", "Result in a failure");
+            }
+        };
+
+        service.get(builder, callback);
+    }
+
+    public static void insertSeason(final int id, int number) {
+        Uri.Builder builder = getBuilder();
+        builder.appendEncodedPath("tv/"+id+"/season/"+number);
+
+        Callback callback = new Callback() {
+            @Override
+            public void onSuccess(JsonObject json) {
+                Log.i("-- INSERTION --", "Value: " + json.toString());
+                JsonArray episodes = json.get("episodes").getAsJsonArray();
+                Iterator<JsonElement> it = episodes.iterator();
+                while (it.hasNext()) {
+                    JsonElement element = it.next();
+                    Episode episode = gson.fromJson(element, Episode.class);
+                    episode.setTV_ID(id);
+
+                    DatabaseService.getInstance().insert(episode);
+                }
             }
 
             @Override

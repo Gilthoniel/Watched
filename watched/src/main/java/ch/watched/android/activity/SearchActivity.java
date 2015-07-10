@@ -11,23 +11,35 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
 import android.widget.ListView;
+import android.widget.Toast;
 import ch.watched.android.R;
 import ch.watched.android.adapters.MediaAdapter;
-import ch.watched.android.adapters.MediaInflater;
-import ch.watched.android.models.Movie;
+import ch.watched.android.adapters.Media;
+import ch.watched.android.database.DatabaseService;
 import ch.watched.android.webservice.WebService;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class SearchActivity extends AppCompatActivity {
 
+    private static Toast toast;
+
+    public static void showToast(CharSequence text) {
+        if (toast != null) {
+            toast.setText(text);
+            toast.show();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        // Toast
+        toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
         SearchAdapter adapter = new SearchAdapter(getSupportFragmentManager());
 
@@ -39,7 +51,7 @@ public class SearchActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(pager);
 
         // Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.search_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -56,18 +68,6 @@ public class SearchActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle states) {
-
-        super.onSaveInstanceState(states);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle states) {
-        super.onRestoreInstanceState(states);
-
     }
 
     /**
@@ -127,7 +127,7 @@ public class SearchActivity extends AppCompatActivity {
      */
     public static class SearchFragment extends ListFragment {
 
-        private List<MediaInflater> medias;
+        private List<Media> medias;
         private MediaAdapter adapter;
 
         @Override
@@ -164,14 +164,21 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onListItemClick(ListView list, View view, int position, long id) {
 
+            Log.i("-- Click --", "click on item "+position);
         }
 
         /**
          * Set the list of medias and reload the adapter
          * @param values the list of medias
          */
-        public void setMedias(List<MediaInflater> values) {
+        public void setMedias(List<Media> values) {
             medias = values;
+
+            // Check if we already have seen those medias
+            for (Media media : medias) {
+                media.updateState();
+            }
+
             if (adapter != null) {
                 adapter.clear();
                 adapter.addAll(medias);
