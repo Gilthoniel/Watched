@@ -2,31 +2,19 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.view.View;
-import android.widget.RelativeLayout;
-import ch.watched.android.adapters.Media;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.EpisodeContract;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
+
+import java.io.Serializable;
 
 /**
  * Created by Gaylor on 06.07.2015.
  * Episode from the MovieDatabase
  */
-public class Episode implements Media {
+public class Episode extends Media implements Serializable {
 
-    public static final String[] PROJECTION = new String[] {
-            EpisodeEntry.COLUMN_EPISOD_ID,
-            EpisodeEntry.COLUMN_DATE,
-            EpisodeEntry.COLUMN_EPISODE_NB,
-            EpisodeEntry.COLUMN_NAME,
-            EpisodeEntry.COLUMN_OVERVIEW,
-            EpisodeEntry.COLUMN_SCORE,
-            EpisodeEntry.COLUMN_SEASON_NB,
-            EpisodeEntry.COLUMN_STILL_PATH,
-            EpisodeEntry.COLUMN_TV_ID,
-            EpisodeEntry.COLUMN_WACTHED
-    };
+    private static final long serialVersionUID = -8663364071143389959L;
 
     public Episode(Cursor cursor) {
         id = cursor.getInt(0);
@@ -41,7 +29,7 @@ public class Episode implements Media {
         watched = cursor.getInt(9) == 1;
     }
 
-    private int id;
+    private long id;
     private String air_date;
     private int episode_number;
     private String name;
@@ -49,8 +37,16 @@ public class Episode implements Media {
     private int season_number;
     private String still_path;
     private float vote_average;
-    private int tv_id;
+    private long tv_id;
     private boolean watched;
+
+    public long getID() {
+        return id;
+    }
+
+    public String getPoster() {
+        return still_path;
+    }
 
     public String getDate() {
         return air_date;
@@ -60,7 +56,7 @@ public class Episode implements Media {
         return episode_number;
     }
 
-    public String getName() {
+    public String getTitle() {
         return name;
     }
 
@@ -76,32 +72,26 @@ public class Episode implements Media {
         return still_path;
     }
 
-    public float getScore() {
+    public float getRating() {
         return vote_average;
     }
 
-    public int getTV_ID() {
+    public long getTV_ID() {
         return tv_id;
+    }
+
+    public void setTV_ID(long value) {
+        tv_id = value;
     }
 
     public boolean isWatched() {
         return watched;
     }
 
-    public void setWatched(boolean value) {
-        watched = value;
-        DatabaseService.getInstance().update(this, value ? 1 : 0);
-    }
-
     @Override
-    public View inflate(RelativeLayout layout) {
-        return null;
-    }
-
-    @Override
-    public ContentValues getContentValues() {
+    public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
-        values.put(EpisodeEntry.COLUMN_EPISOD_ID, id);
+        values.put(EpisodeEntry.COLUMN_EPISODE_ID, id);
         values.put(EpisodeEntry.COLUMN_DATE, air_date);
         values.put(EpisodeEntry.COLUMN_EPISODE_NB, episode_number);
         values.put(EpisodeEntry.COLUMN_NAME, name);
@@ -110,40 +100,14 @@ public class Episode implements Media {
         values.put(EpisodeEntry.COLUMN_STILL_PATH, still_path);
         values.put(EpisodeEntry.COLUMN_SCORE, vote_average);
         values.put(EpisodeEntry.COLUMN_TV_ID, tv_id);
-        values.put(EpisodeEntry.COLUMN_WACTHED, watched ? 1 : 0);
+        values.put(EpisodeEntry.COLUMN_WATCHED, watched);
 
         return values;
     }
 
-    public void setTV_ID(int id) {
-        tv_id = id;
-    }
-
     @Override
-    public int getID() {
-        return id;
-    }
-
-    @Override
-    public String getTableName() {
-        return EpisodeContract.EpisodeEntry.TABLE_NAME;
-    }
-
-    @Override
-    public String[] getColumnsProjection() {
-        return new String[] {
-
-        };
-    }
-
-    @Override
-    public int getLayoutID() {
-        return -1;
-    }
-
-    @Override
-    public void updateState() {
-        // TODO
+    public String getSQLTable() {
+        return EpisodeEntry.TABLE_NAME;
     }
 
     @Override

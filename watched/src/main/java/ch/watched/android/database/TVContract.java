@@ -8,10 +8,25 @@ import android.provider.BaseColumns;
 public class TVContract {
     public TVContract() {}
 
+    public static final String[] PROJECTION = new String[] {
+            TVContract.TVEntry.COLUMN_ID,
+            TVContract.TVEntry.COLUMN_HOMEPAGE,
+            TVContract.TVEntry.COLUMN_IN_PROD,
+            TVContract.TVEntry.COLUMN_LANGUAGE,
+            TVContract.TVEntry.COLUMN_NAME,
+            TVContract.TVEntry.COLUMN_NB_EPISODES,
+            TVContract.TVEntry.COLUMN_NB_SEASONS,
+            TVContract.TVEntry.COLUMN_OVERVIEW,
+            TVContract.TVEntry.COLUMN_POSTER,
+            TVContract.TVEntry.COLUMN_SCORE,
+            TVContract.TVEntry.COLUMN_STATUS,
+            TVContract.TVEntry.COLUMN_TYPE
+    };
+
     public static abstract class TVEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "tv";
-        public static final String COLUMN_ID = "tv_id";
+        public static final String COLUMN_ID = "id";
         public static final String COLUMN_HOMEPAGE = "homepage";
         public static final String COLUMN_IN_PROD = "in_prod";
         public static final String COLUMN_NAME = "name";

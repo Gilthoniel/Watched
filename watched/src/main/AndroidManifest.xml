@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.watched.android" >
+    package="ch.watched" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        android:theme="@style/AppTheme"
+        android:name=".android.BaseApplication">
+
         <activity
-            android:name=".activity.MainActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name" >
+            android:name=".android.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,13 +25,14 @@
 
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".activity.SearchActivity" />
+                android:value=".android.SearchActivity" />
         </activity>
 
         <activity
-            android:name=".activity.SearchActivity"
+            android:name=".android.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".android.HomeActivity" >
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -35,16 +40,11 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-        </activity>
-
-        <activity
-            android:name=".activity.ActivityTV"
-            android:label="@string/title_activity_activity_tv"
-            android:parentActivityName=".activity.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.watched.android.activity.MainActivity" />
+                android:value=".android.HomeActivity" />
         </activity>
+
     </application>
 
 </manifest>

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="media_pinned">#ff26599e</color>
+    <color name="ColorPrimary">#ff326ebe</color>
+    <color name="ColorPrimaryDark">#ff2f4c98</color>
+    <color name="tabsScrollColor">#ff164664</color>
 
-    <color name="list_divider">#ff470100</color>
-    <color name="list_background">#ff780c0c</color>
+    <!-- Color for the comparison -->
+    <color name="appColor">#ff393939</color>
+    <color name="comparisonColor">#FF4FBBDE</color>
 
-    <color name="ColorPrimary">#ffad2420</color>
-    <color name="ColorPrimaryDark">#ff780c0c</color>
-
-    <color name="media_seen">#ff2d9639</color>
-    <color name="media_unseen">#ff26599e</color>
-
-    <color name="header_listview_episodes">#ff2a2a2a</color>
-    <color name="item_listview_episodes">#ff383838</color>
+    <!-- Color for the reviews -->
+    <color name="reviewTitleColor">#ff000000</color>
 </resources>

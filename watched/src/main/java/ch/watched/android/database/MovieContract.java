@@ -9,9 +9,19 @@ import android.provider.BaseColumns;
 public final class MovieContract {
     public MovieContract() {}
 
+    public static final String[] PROJECTION = new String[] {
+            MovieEntry.COLUMN_MOVIE_ID,
+            MovieEntry.COLUMN_WATCHED,
+            MovieEntry.COLUMN_IMAGE,
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_OVERVIEW,
+            MovieEntry.COLUMN_RELEASE,
+            MovieEntry.COLUMN_SCORE
+    };
+
     public static abstract class MovieEntry implements BaseColumns {
         public static final String TABLE_NAME = "movie";
-        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_MOVIE_ID = "id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_SCORE = "score";

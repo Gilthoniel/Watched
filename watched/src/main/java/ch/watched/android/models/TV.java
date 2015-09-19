@@ -2,38 +2,21 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import ch.watched.android.R;
-import ch.watched.android.adapters.Media;
 import ch.watched.android.database.TVContract;
-import ch.watched.android.webservice.WebService;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Gaylor on 07.07.2015.
  * TV Show for MovieDatabase
  */
-public class TV implements Media {
+public class TV extends Media implements Serializable {
 
-    public static final String[] PROJECTION = new String[] {
-            TVContract.TVEntry.COLUMN_ID,
-            TVContract.TVEntry.COLUMN_HOMEPAGE,
-            TVContract.TVEntry.COLUMN_IN_PROD,
-            TVContract.TVEntry.COLUMN_LANGUAGE,
-            TVContract.TVEntry.COLUMN_NAME,
-            TVContract.TVEntry.COLUMN_NB_EPISODES,
-            TVContract.TVEntry.COLUMN_NB_SEASONS,
-            TVContract.TVEntry.COLUMN_OVERVIEW,
-            TVContract.TVEntry.COLUMN_POSTER,
-            TVContract.TVEntry.COLUMN_SCORE,
-            TVContract.TVEntry.COLUMN_STATUS,
-            TVContract.TVEntry.COLUMN_TYPE
-    };
+    private static final long serialVersionUID = -968718735212066593L;
 
     private String homepage;
-    private int id;
+    private long id;
     private boolean in_production;
     private String name;
     private int number_of_episodes;
@@ -45,8 +28,7 @@ public class TV implements Media {
     private String status;
     private String type;
     private float vote_average;
-
-    private MediaState state;
+    private List<Season> seasons;
 
     public TV(Cursor cursor) {
         id = cursor.getInt(0);
@@ -61,41 +43,39 @@ public class TV implements Media {
         vote_average = cursor.getFloat(9);
         status = cursor.getString(10);
         type = cursor.getString(11);
-
-        state = MediaState.PINNED;
     }
 
-    public String getImage() {
+    @Override
+    public long getID() {
+        return id;
+    }
+
+    @Override
+    public String getPoster() {
         return poster_path;
     }
 
+    @Override
     public String getTitle() {
         return name;
     }
 
-    public float getScore() {
+    @Override
+    public float getRating() {
         return vote_average / 2;
     }
 
+    @Override
     public String getOverview() {
         return overview;
     }
 
-    public String getStatus() {
-        return status;
+    public List<Season> getSeasons() {
+        return seasons;
     }
 
     @Override
-    public View inflate(RelativeLayout layout) {
-
-        TextView title = (TextView) layout.findViewById(R.id.title);
-        title.setText(name);
-
-        return layout;
-    }
-
-    @Override
-    public ContentValues getContentValues() {
+    public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
         values.put(TVContract.TVEntry.COLUMN_ID, id);
         values.put(TVContract.TVEntry.COLUMN_HOMEPAGE, homepage);
@@ -115,27 +95,12 @@ public class TV implements Media {
     }
 
     @Override
-    public String getTableName() {
+    public String getSQLTable() {
         return TVContract.TVEntry.TABLE_NAME;
     }
 
-    @Override
-    public String[] getColumnsProjection() {
-        return PROJECTION;
-    }
-
-    @Override
-    public int getID() {
-        return id;
-    }
-
-    @Override
-    public int getLayoutID() {
-        return R.layout.item_tv_list;
-    }
-
-    @Override
-    public void updateState() {
-        state = MediaState.PINNED;
+    public class Season {
+        public long id;
+        public int season_number;
     }
 }
