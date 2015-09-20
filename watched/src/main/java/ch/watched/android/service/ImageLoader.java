@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class ImageLoader {
 
-    private static final int MAXIMUM_IMAGES_STACK = 50;
+    private static final int MAXIMUM_IMAGES_STACK = 20;
 
     public enum ImageType { POSTER, BACKDROP }
 

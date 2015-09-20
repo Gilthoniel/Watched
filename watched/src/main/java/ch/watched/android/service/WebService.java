@@ -3,6 +3,8 @@ package ch.watched.android.service;
 import android.net.Uri;
 import ch.watched.android.service.utils.RequestCallback;
 
+import java.io.Serializable;
+
 /**
  * Created by gaylor on 27.06.15.
  * Base of a web service implementation
@@ -15,7 +17,7 @@ public abstract class WebService {
      * @param callback call when the request is over
      * @param <T> Type of the object requested
      */
-    public <T> void get(Uri.Builder builder, RequestCallback<T> callback, String cacheKey) {
+    public <T extends Serializable> void get(Uri.Builder builder, RequestCallback<T> callback, String cacheKey) {
 
         ConnectionService.instance.executeGetRequest(builder, callback, cacheKey);
     }

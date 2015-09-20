@@ -2,9 +2,11 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.MovieContract;
 import ch.watched.android.database.MovieContract.MovieEntry;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,8 +20,6 @@ public class Movie extends Media implements Serializable {
     private static final long serialVersionUID = -2183465616196807646L;
 
     private boolean adult;
-    private String backdrop_path;
-    private List<Integer> genre_ids;
     private long id;
     private String original_language;
     private String original_title;
@@ -31,6 +31,8 @@ public class Movie extends Media implements Serializable {
     private float vote_average;
     private long vote_count;
     private boolean isWatched;
+    private ImagesWrapper images;
+    private List<Genre> genres;
 
     public Movie(Cursor cursor) {
         id = cursor.getLong(1);
@@ -40,6 +42,9 @@ public class Movie extends Media implements Serializable {
         vote_average = cursor.getFloat(5);
         poster_path = cursor.getString(6);
         release_date = cursor.getString(7);
+        images = new ImagesWrapper();
+        images.backdrops = Utils.getObject(cursor.getBlob(8), new TypeToken<List<Backdrop>>(){}.getType());
+        genres = Utils.getObject(cursor.getBlob(9), new TypeToken<List<Genre>>(){}.getType());
     }
 
     @Override
@@ -85,16 +90,31 @@ public class Movie extends Media implements Serializable {
         return isWatched;
     }
 
+    public void setWatched(boolean value) {
+        isWatched = value;
+        DatabaseService.getInstance().update(this);
+    }
+
+    public List<Backdrop> getBackdrops() {
+        return images.backdrops;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
     @Override
     public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
         values.put(MovieEntry.COLUMN_MOVIE_ID, id);
         values.put(MovieEntry.COLUMN_TITLE, title);
-        values.put(MovieEntry.COLUMN_WATCHED, false);
+        values.put(MovieEntry.COLUMN_WATCHED, isWatched);
         values.put(MovieEntry.COLUMN_OVERVIEW, overview);
         values.put(MovieEntry.COLUMN_IMAGE, poster_path);
         values.put(MovieEntry.COLUMN_RELEASE, release_date);
         values.put(MovieEntry.COLUMN_SCORE, vote_average);
+        values.put(MovieEntry.COLUMN_BACKDROPS, Utils.getBytes(images.backdrops));
+        values.put(MovieEntry.COLUMN_GENRES, Utils.getBytes(genres));
 
         return values;
     }
@@ -102,5 +122,11 @@ public class Movie extends Media implements Serializable {
     @Override
     public String getSQLTable() {
         return MovieEntry.TABLE_NAME;
+    }
+
+    private class ImagesWrapper implements Serializable {
+        private static final long serialVersionUID = 2399617677302005418L;
+
+        private List<Backdrop> backdrops;
     }
 }

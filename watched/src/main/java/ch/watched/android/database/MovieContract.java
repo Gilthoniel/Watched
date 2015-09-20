@@ -9,16 +9,6 @@ import android.provider.BaseColumns;
 public final class MovieContract {
     public MovieContract() {}
 
-    public static final String[] PROJECTION = new String[] {
-            MovieEntry.COLUMN_MOVIE_ID,
-            MovieEntry.COLUMN_WATCHED,
-            MovieEntry.COLUMN_IMAGE,
-            MovieEntry.COLUMN_TITLE,
-            MovieEntry.COLUMN_OVERVIEW,
-            MovieEntry.COLUMN_RELEASE,
-            MovieEntry.COLUMN_SCORE
-    };
-
     public static abstract class MovieEntry implements BaseColumns {
         public static final String TABLE_NAME = "movie";
         public static final String COLUMN_MOVIE_ID = "id";
@@ -28,6 +18,8 @@ public final class MovieContract {
         public static final String COLUMN_IMAGE = "poster";
         public static final String COLUMN_RELEASE = "release_date";
         public static final String COLUMN_WATCHED = "watched";
+        public static final String COLUMN_BACKDROPS = "backdrops";
+        public static final String COLUMN_GENRES = "genres";
 
         public static final String SQL_CREATE = "create table "+TABLE_NAME+" (" +
                 MovieEntry._ID + " INTEGER PRIMARY KEY," +
@@ -37,7 +29,9 @@ public final class MovieContract {
                 MovieEntry.COLUMN_OVERVIEW + " TEXT," +
                 MovieEntry.COLUMN_SCORE + " REAL," +
                 MovieEntry.COLUMN_IMAGE + " TEXT," +
-                MovieEntry.COLUMN_RELEASE + " TEXT" +
+                MovieEntry.COLUMN_RELEASE + " TEXT," +
+                MovieEntry.COLUMN_BACKDROPS + " BLOB," +
+                MovieEntry.COLUMN_GENRES + " BLOB" +
                 ");";
 
         public static final String SQL_DELETE = "drop table if exists " + MovieEntry.TABLE_NAME;

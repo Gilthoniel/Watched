@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ch.watched.R;
+import ch.watched.android.MovieActivity;
 import ch.watched.android.TvActivity;
 import ch.watched.android.adapters.MediaCardAdapter;
 import ch.watched.android.constants.Constants;
@@ -56,6 +57,15 @@ public class ResumeFragment extends HomeFragment {
         movies.setLayoutManager(moviesManager);
 
         mMoviesAdapter = new MediaCardAdapter<>(DatabaseService.getInstance().getUnwatchMovies());
+        mMoviesAdapter.setOnItemClickListener(new MediaCardAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent intent = new Intent(getContext(), MovieActivity.class);
+                intent.putExtra(Constants.KEY_INDEX, mMoviesAdapter.getItemId(position));
+
+                startActivity(intent);
+            }
+        });
         movies.setAdapter(mMoviesAdapter);
 
         RecyclerView series = (RecyclerView) getView().findViewById(R.id.recycler_series);

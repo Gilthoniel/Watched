@@ -5,11 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
+import android.widget.*;
 import ch.watched.R;
 import ch.watched.android.adapters.EpisodeExpandableAdapter;
 import ch.watched.android.constants.Constants;
@@ -22,25 +21,33 @@ public class TvActivity extends AppCompatActivity {
 
     private EpisodeExpandableAdapter mAdapter;
     private ExpandableListView mEpisodes;
+    private long mID;
+    private TV mTV;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle states) {
+        super.onCreate(states);
         setContentView(R.layout.activity_tv);
 
         Intent intent = getIntent();
-        long id = intent.getLongExtra(Constants.KEY_MEDIA_ID, 0);
+        if (intent != null) {
+            mID = intent.getLongExtra(Constants.KEY_MEDIA_ID, 0);
+        } else if (states != null) {
+            mID = states.getLong(Constants.KEY_INDEX);
+        } else {
+            mID = 0;
+        }
 
-        TV tv = DatabaseService.getInstance().getTV(id);
-        setTitle(tv.getTitle());
+        mTV = DatabaseService.getInstance().getTV(mID);
+        setTitle("");
 
-        ((TextView) findViewById(R.id.media_title)).setText(tv.getTitle());
+        ((TextView) findViewById(R.id.media_title)).setText(mTV.getTitle());
 
         // Backdrops animation
         ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
         flipper.setInAnimation(getApplicationContext(), R.anim.abc_fade_in);
         flipper.setOutAnimation(getApplicationContext(), R.anim.abc_fade_out);
-        for (Backdrop backdrop : tv.getBackdrops()) {
+        for (Backdrop backdrop : mTV.getBackdrops().size() > 5 ? mTV.getBackdrops().subList(0, 5) : mTV.getBackdrops()) {
             ImageView image = new ImageView(getApplicationContext());
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             ViewFlipper.LayoutParams params = new ViewFlipper.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -54,7 +61,26 @@ public class TvActivity extends AppCompatActivity {
 
         // Episodes
         mEpisodes = (ExpandableListView) findViewById(R.id.list_episodes);
-        mAdapter = new EpisodeExpandableAdapter(DatabaseService.getInstance().getEpisodes(tv.getID()));
+        mEpisodes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                int itemType = ExpandableListView.getPackedPositionType(id);
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    int group = ExpandableListView.getPackedPositionGroup(id) - 1;
+
+                    boolean watched = mAdapter.containsUnwatchedChild(group);
+                    for (int i = 0; i < mAdapter.getChildrenCount(group); i++) {
+                        mAdapter.getChild(group, i).setWatched(watched);
+                    }
+
+                    mAdapter.notifyDataSetChanged();
+                }
+
+                return true;
+            }
+        });
+        mAdapter = new EpisodeExpandableAdapter(DatabaseService.getInstance().getEpisodes(mTV.getID()));
         mEpisodes.setAdapter(mAdapter);
 
         // Toolbar
@@ -70,9 +96,11 @@ public class TvActivity extends AppCompatActivity {
     public void onPostCreate(Bundle states) {
         super.onPostCreate(states);
 
+        boolean alreadyExpand = false;
         for (int i = 0; i < mAdapter.getGroupCount(); i++) {
-            if (mAdapter.containsUnwatchedChild(i)) {
+            if (!alreadyExpand && mAdapter.containsUnwatchedChild(i)) {
                 mEpisodes.expandGroup(i, true);
+                alreadyExpand = true;
             } else {
                 mEpisodes.collapseGroup(i);
             }
@@ -80,8 +108,30 @@ public class TvActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle states) {
+        super.onSaveInstanceState(states);
+
+        states.putLong(Constants.KEY_INDEX, mID);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_tv, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_remove:
+
+                DatabaseService.getInstance().remove(mTV);
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

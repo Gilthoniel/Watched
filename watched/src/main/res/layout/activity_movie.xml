@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="ch.watched.android.MovieActivity">
+
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar" />
+
+    <ViewFlipper
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/flipper"
+            android:flipInterval="2000" android:autoStart="true" android:animateFirstView="true"
+            android:layout_below="@+id/toolbar" android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true" android:layout_alignParentRight="true"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:id="@+id/media_title" android:layout_alignParentStart="false"
+            android:layout_alignBottom="@+id/flipper" android:layout_alignParentLeft="true"
+            android:padding="10dp" android:background="#c8000000" android:layout_toStartOf="@+id/media_watched"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Genres"
+            android:id="@+id/media_genres" android:layout_below="@+id/flipper" android:layout_alignParentStart="true"
+            android:padding="10dp" android:layout_toStartOf="@+id/media_rating"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:id="@+id/media_overview" android:layout_below="@+id/media_genres"
+            android:layout_alignParentStart="true" android:textSize="12sp" android:paddingLeft="10dp"
+            android:paddingRight="10dp" android:textStyle="italic"/>
+    <RatingBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/media_rating" android:layout_below="@+id/flipper" android:layout_alignParentEnd="true"
+            style="?android:ratingBarStyleSmall" android:numStars="5" android:rating="2.5"
+            android:layout_marginTop="10dp" android:layout_marginRight="10dp"/>
+    <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Watched"
+            android:id="@+id/media_watched" android:layout_alignParentBottom="false"
+            android:layout_alignBottom="@+id/flipper" android:layout_alignParentRight="true"
+            android:checked="false" android:layout_alignTop="@+id/media_title"
+            android:clickable="false" android:background="#c8000000" android:paddingRight="10dp"/>
+</RelativeLayout>

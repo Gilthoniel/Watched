@@ -3,6 +3,7 @@ package ch.watched.android.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import ch.watched.android.adapters.MovieExpandableAdapter;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
 import ch.watched.android.database.MovieContract.MovieEntry;
 import ch.watched.android.database.TVContract.TVEntry;
@@ -63,6 +64,24 @@ public class DatabaseService {
         return movies;
     }
 
+    public List<Movie> getMovies(MovieExpandableAdapter adapter) {
+        List<Movie> movies = new LinkedList<>();
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME, null);
+            while (cursor.getCount() > 0 && !cursor.isLast()) {
+                cursor.moveToNext();
+
+                adapter.addMovie(new Movie(cursor));
+            }
+
+            cursor.close();
+        }
+
+        return movies;
+    }
+
     public List<TV> getUnwatchedTVs() {
         List<TV> series = new LinkedList<>();
 
@@ -83,6 +102,42 @@ public class DatabaseService {
         }
 
         return series;
+    }
+
+    public List<TV> getTVs() {
+        List<TV> series = new LinkedList<>();
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            Cursor cursor = db.rawQuery("SELECT * FROM " + TVContract.TVEntry.TABLE_NAME, null);
+
+            while (cursor.getCount() > 0 && !cursor.isLast()) {
+                cursor.moveToNext();
+
+                series.add(new TV(cursor));
+            }
+
+            cursor.close();
+        }
+
+        return series;
+    }
+
+    public Movie getMovie(long id) {
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            try (Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME + " WHERE id=" + id, null)) {
+
+                if (cursor.getCount() > 0) {
+                    cursor.moveToNext();
+
+                    return new Movie(cursor);
+                }
+            }
+        }
+
+        return null;
     }
 
     public TV getTV(long id) {

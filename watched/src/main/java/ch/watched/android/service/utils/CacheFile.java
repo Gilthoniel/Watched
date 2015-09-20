@@ -1,8 +1,6 @@
 package ch.watched.android.service.utils;
 
 import java.io.File;
-import java.net.URI;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by gaylor on 05-Aug-15.
@@ -10,33 +8,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class CacheFile extends File {
 
-    private ReentrantReadWriteLock lock;
+    private long expiration;
 
     public CacheFile(File dir, String name) {
         super(dir, name);
 
-        lock = new ReentrantReadWriteLock();
+        expiration = 0;
     }
 
-    public CacheFile(String path) {
-        super(path);
+    public CacheFile(File dir, String name, long expiration) {
+        this(dir, name);
 
-        lock = new ReentrantReadWriteLock();
+        this.expiration = expiration;
     }
 
-    public CacheFile(String dirPath, String name) {
-        super(dirPath, name);
-
-        lock = new ReentrantReadWriteLock();
-    }
-
-    public CacheFile(URI uri) {
-        super(uri);
-
-        lock = new ReentrantReadWriteLock();
-    }
-
-    public ReentrantReadWriteLock getLock() {
-        return lock;
+    public boolean isExpired() {
+        return expiration > 0 && System.currentTimeMillis() > expiration;
     }
 }

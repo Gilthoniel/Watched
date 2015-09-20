@@ -11,6 +11,7 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.Callable;
@@ -22,7 +23,7 @@ import java.util.concurrent.Future;
  * Created by gaylor on 27.07.15.
  * Execute an HTTP request to get JSON information and return into a java class
  */
-public class GetTask<T> extends HttpTask<T> {
+public class GetTask<T extends Serializable> extends HttpTask<T> {
 
     private Future<T> mFuture;
     private RequestCallback<T> callback;

@@ -1,10 +1,14 @@
 package ch.watched.android.service.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created by gaylor on 04-Aug-15.
@@ -13,206 +17,205 @@ import java.util.*;
  */
 public class DiskTimedCache {
 
-    public static final String JOURNAL_FILE_NAME = "journal";
-
-    private LinkedList<CacheFile> mStack;
+    private LinkedList<String> mStack;
+    private Map<String, CacheFile> mFiles;
     private File mDirectory;
-    private CacheFile mJournal;
     private long mMaxSize;
     private int mVersion;
-    private boolean isInitiated;
 
     private DiskTimedCache() {
 
         // Stack to manage the LRU policy
         mStack = new LinkedList<>();
-
-        isInitiated = false;
+        mFiles = new HashMap<>();
     }
 
-    public File getDirectory() {
-
-        return mDirectory;
-    }
-
-    public List<CacheFile> getStack() {
-        return mStack;
+    public void setStack(LinkedList<String> stack) {
+        mStack = stack;
     }
 
     /**
-     * Get an editor to set a value
+     * Return true if the key is in the cache and the element is not expired
      * @param key Key of the object
-     * @param expiredTime in millisecond
-     * @return Editor
+     * @return true or false
      */
-    public Editor edit(String key, int expiredTime) {
-        if (!key.matches("^[a-z0-9-_]{1,64}$")) {
-            throw new BadKeyException();
-        }
+    public boolean contains(String key) {
+        return mStack.contains(key) && !mFiles.get(key).isExpired() && mFiles.get(key).exists();
+    }
 
-        // Check the state of the cache
-        if (!isInitiated) {
+    /**
+     * Return an object with the key
+     * @param key Key of the object
+     * @return An Object or null
+     */
+    public Object get(String key) {
+
+        CacheFile file = searchCacheFile(key);
+        if (file == null) {
             return null;
         }
 
-        // File where to populate the object
-        CacheFile file = searchFileInCache(key);
+        // Put the element at the top of the list
+        mStack.remove(key);
+        mStack.push(key);
 
-        // Get the write lock
-        file.getLock().writeLock().lock();
-
-        Editor editor = new Editor();
+        ObjectInputStream stream = null;
         try {
 
-            // Stream for the user
-            editor.mStream = new BufferedOutputStream(new FileOutputStream(file));
-            editor.mFile = file;
+            stream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
 
-            // Only if we can open the stream without exception
-            if (!updateStack(file, expiredTime)) {
+            return stream.readObject();
 
-                editor.commit();
-                editor = null;
+        } catch (ClassNotFoundException | IOException e) {
+
+            Log.e("__CACHE__", "Can't find a file which must exist");
+            return null;
+
+        } finally {
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ignored) {}
             }
-
-        } catch (FileNotFoundException e) {
-
-            Log.e("__CACHE__", "When create object file: " + file.getAbsolutePath());
-            e.printStackTrace();
-
-            file.getLock().writeLock().unlock();
-
         }
-
-        return editor;
     }
 
     /**
-     * Edit without cache
-     * @param key Key of the object
-     * @return an Editor which contains a stream
+     * Return an image with the key
+     * @param key Key of the image
+     * @return a Bitmap or null
      */
-    public Editor edit(String key) {
+    public Bitmap getImage(String key) {
 
-        return edit(key, 0);
-
-    }
-
-    /**
-     * Get an accessor to read a object in the stack
-     * @param key Key of the object
-     * @return Accessor
-     */
-    public Accessor get(String key) {
-        if (!key.matches("^[a-z0-9-_]{1,64}$")) {
-            throw new BadKeyException();
-        }
-
-        // Check the state of the cache
-        if (!isInitiated) {
+        CacheFile file = searchCacheFile(key);
+        if (file == null) {
             return null;
         }
 
-        CacheFile file = searchFileInCache(key);
+        // Put the element at the top of the list
+        mStack.remove(key);
+        mStack.push(key);
 
-        file.getLock().readLock().lock();
-
+        InputStream stream = null;
         try {
-            // throw exception if the key doesn't exist
-            Accessor accessor = new Accessor();
-            accessor.mFile = file;
-            accessor.mStream = new BufferedInputStream(new FileInputStream(file));
+            stream = new BufferedInputStream(new FileInputStream(file));
 
-            // Put the file at the top of the stack if it exists
-            if (updateStack(file)) {
+            return BitmapFactory.decodeStream(stream);
 
-                return accessor;
-            } else {
+        } catch (IOException e) {
 
-                accessor.commit();
+            Log.e("__CACHE__", "Can't read image file");
+            return null;
+
+        } finally {
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ignored) {}
             }
-
-        } catch (FileNotFoundException e) {
-            file.getLock().readLock().unlock();
         }
-
-        return null;
     }
 
     /**
-     * Shutdown the cache, without removing the content
+     * Add an object to the cache with an expiration time in ms
+     * @param key Key of the object
+     * @param object Object
+     * @param expiration Timestamp of the expiration
+     * @param <T> Special type for the object
      */
-    public void close() {
+    public <T extends Serializable> void add(String key, T object, long expiration) {
 
-    }
-
-    /* Public class */
-
-    public class Editor {
-
-        private OutputStream mStream;
-        private CacheFile mFile;
-
-        private Editor() {}
-
-        public OutputStream getStream() {
-            return mStream;
+        CacheFile file = searchCacheFile(key, expiration);
+        if (file == null) {
+            return;
         }
 
-        /**
-         * End of transaction, to check max size
-         */
-        public void commit() {
-            try {
+        ObjectOutputStream stream = null;
+        try {
+            // Create the file
+            stream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+            stream.writeObject(object);
 
-                mStream.flush();
-                mStream.close();
+            stream.flush();
 
-                // Check the size of the cache
-                long size = 0;
-                for (CacheFile file : mStack) {
+            // Populate the stack and map
+            mStack.push(key);
+            mFiles.put(key, file);
 
-                    size += file.length();
+            checkMaxSize();
+        } catch (IOException e) {
+
+            Log.e("__CACHE__", "Can't write a file cache");
+
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-                /* Check the size of the cache */
-                while (size > mMaxSize - mJournal.length()) {
-                    CacheFile file = mStack.removeLast();
-                    long fileSize = file.length();
-
-                    if (file.delete()) {
-                        size -= fileSize;
-                    }
-                }
-
-            } catch (IOException e) {
-
-                e.printStackTrace();
-
             }
-
-            mFile.getLock().writeLock().unlock();
         }
     }
 
-    public class Accessor {
+    /**
+     * Add an object with no expiration time
+     * @param key Key of the object
+     * @param object Object which implements Serializable
+     * @param <T> Special type for the object
+     */
+    public <T extends Serializable> void add(String key, T object) {
 
-        private InputStream mStream;
-        private CacheFile mFile;
+        add(key, object, 0);
+    }
 
-        private Accessor() {}
-
-        public InputStream getStream() {
-            return mStream;
+    /**
+     * Add an image to the cache
+     * @param key Key of the image
+     * @param bitmap Bitmap of the image
+     */
+    public void add(String key, Bitmap bitmap) {
+        CacheFile file = searchCacheFile(key, 0);
+        if (file == null) {
+            return;
         }
 
-        public void commit() {
-            try {
-                mStream.close();
-            } catch (IOException ignored) {}
+        OutputStream stream = null;
+        try {
+            stream = new BufferedOutputStream(new FileOutputStream(file));
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
-            mFile.getLock().readLock().unlock();
+            stream.flush();
+
+            // Populate the stack and map
+            mStack.push(key);
+            mFiles.put(key, file);
+
+        } catch (IOException e) {
+
+            Log.e("__CACHE__", "Can't save bitmap into file");
+
+        } finally {
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+    }
+
+    /**
+     * Empty the cache and clear the directory
+     */
+    public void clear() {
+        mStack.clear();
+        mFiles.clear();
+        cleanDirectory();
     }
 
     /**
@@ -230,9 +233,7 @@ public class DiskTimedCache {
          * @param maxSize maximum size of the cache (NOT STRICT)
          * @return the instantiate cache or null if a failure occurred
          */
-        public DiskTimedCache open(@NonNull File file, int version, long maxSize)
-            throws IOException
-        {
+        public DiskTimedCache open(@NonNull File file, int version, long maxSize) throws IOException {
 
             DiskTimedCache cache = new DiskTimedCache();
             cache.mDirectory = file;
@@ -249,47 +250,19 @@ public class DiskTimedCache {
                 Log.d("__CACHE__", "Cache directory created");
             }
 
-            // Create log journal
-            CacheFile journal = new CacheFile(file.getAbsolutePath(), JOURNAL_FILE_NAME + "_" + cache.mVersion);
-            if (!journal.createNewFile() && !journal.canWrite()) {
-                throw new IOException("Can't read/write the journal file");
-            }
-            cache.mJournal = journal;
-
-            // Try to open the journal file
-            try {
-                BufferedReader stream = new BufferedReader(new FileReader(journal));
-
-                String line;
-                while ((line = stream.readLine()) != null) {
-
-                    String[] parts = line.split(" ");
-                    CacheFile item = new CacheFile(cache.mDirectory, parts[0]);
-
-                    cache.mStack.addLast(item);
-                }
-                stream.close();
-
-            } catch (IOException e) {
-                // The file is not found or corrupt so we don't have anything to do
-                // because the files will be deleted
-            }
-
-            cache.isInitiated = true;
             return cache;
         }
 
         public DiskTimedCache empty() {
 
-            DiskTimedCache cache = new DiskTimedCache();
-            cache.isInitiated = false;
-
-            return cache;
+            return new DiskTimedCache();
         }
     }
 
     /* Exceptions */
     public class BadKeyException extends IllegalArgumentException {
+
+        private static final long serialVersionUID = -5686499348456010299L;
 
         @Override
         public String getMessage() {
@@ -299,155 +272,91 @@ public class DiskTimedCache {
 
     /* Private functions */
 
-    private boolean updateStack(CacheFile file, int expirationTime) {
+    private void checkMaxSize() {
 
-        int index = mStack.indexOf(file);
-        if (index > -1) {
-            mStack.remove(index);
+        cleanDirectory();
+
+        long size = 0;
+        String[] files = mDirectory.list();
+        for (String filename : files) {
+            File file = new File(mDirectory, filename);
+
+            size += file.length();
         }
-        mStack.addFirst(file);
 
-        try {
+        while (size > mMaxSize && mDirectory.list().length > 0) {
 
-            BufferedReader reader = new BufferedReader(new FileReader(mJournal));
+            String key = mStack.getLast();
+            size -= mFiles.get(key).length();
 
-            Map<String, Integer> data = new HashMap<>();
-            data.put(file.getName(), expirationTime);
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-
-                String filename = getFilenameFromLine(line);
-                if (!filename.equals(file.getName())) {
-                    int expiration = getExpirationFromLine(line);
-                    data.put(filename, expiration);
-                }
+            if (!mFiles.get(key).delete()) {
+                Log.e("__CACHE__", "Error when trying to delete a file in the cache.");
             }
 
-            reader.close();
-
-            // Write data in the journal
-            updateJournal(data);
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean updateStack(CacheFile file) {
-
-        int index = mStack.indexOf(file);
-        if (index > -1) {
-            mStack.remove(index);
-        }
-
-        try {
-
-            BufferedReader reader = new BufferedReader(new FileReader(mJournal));
-            for (int i = 0; i < index; i++) {
-                reader.readLine();
-            }
-
-            String line = reader.readLine();
-            reader.close();
-            if (line != null) {
-                int expiration = getExpirationFromLine(line);
-                if (expiration <= 0 || file.lastModified() + expiration > new Date().getTime()) {
-
-                    mStack.addFirst(file);
-                } else {
-
-                    cleanDirectory();
-                    return false;
-                }
-            } else {
-
-                Log.e("__CACHE__", "Journal corrupted");
-            }
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    private CacheFile searchFileInCache(String key) {
-
-        for (CacheFile file : mStack) {
-            if (file.getName().equals(key)) {
-                return file;
-            }
-        }
-
-        return new CacheFile(mDirectory, key);
-    }
-
-    private int getExpirationFromLine(String line) {
-
-        int index = line.lastIndexOf(' ');
-        if (index >= 0) {
-
-            return Integer.parseInt(line.substring(index + 1));
-        } else {
-
-            return 0;
-        }
-    }
-
-    private String getFilenameFromLine(String line) {
-
-        int index = line.lastIndexOf(' ');
-        if (index >= 0) {
-
-            return line.substring(0, index);
-        } else {
-
-            return "";
-        }
-    }
-
-    private void updateJournal(Map<String, Integer> data) {
-
-        try {
-
-            PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(mJournal, false)));
-            for (CacheFile file : mStack) {
-
-                int expiration = data.containsKey(file.getName()) ? data.get(file.getName()) : 0;
-
-                writer.println(file.getName() + " " + expiration);
-            }
-
-            writer.close();
-
-        } catch (FileNotFoundException e) {
-
-            Log.e("__CACHE__", "Can't write on the journal");
+            mStack.remove(key);
+            mFiles.remove(key);
         }
     }
 
     private void cleanDirectory() {
 
+        for (Map.Entry<String,CacheFile> entry : mFiles.entrySet()) {
+            if (entry.getValue().isExpired()) {
+                if (!entry.getValue().delete()) {
+                    Log.e("__CACHE__", "Can't remove a file");
+                }
+
+                mStack.remove(entry.getKey());
+                mFiles.remove(entry.getKey());
+            }
+        }
+
         String[] filesList = mDirectory.list();
         if (filesList != null) {
             for (String filename : filesList) {
-                CacheFile item = searchFileInCache(filename);
 
-                if (!item.getName().equals(mJournal.getName()) && !mStack.contains(item) && !item.delete()) {
-                    Log.e("__CACHE__", "Error when trying to delete a file in the cache: " + item.getPath());
+                if (!mStack.contains(filename)) {
+                    File file = new File(mDirectory, filename);
+
+                    if (!file.delete()) {
+                        Log.e("__CACHE__", "Error when trying to delete a file in the cache: " + file.getPath());
+                    }
                 }
             }
         } else {
 
             Log.e("__CACHE__", "Can't clean the cache directory");
         }
+
+        Log.i("__CACHE__", "Directory size after cleaning: "+mDirectory.list().length);
+    }
+
+    private CacheFile searchCacheFile(String key, long expiration) {
+        if (!key.matches("^[a-z0-9-_]{1,64}$")) {
+            throw new BadKeyException();
+        }
+
+        if (mDirectory == null) {
+            return null;
+        }
+
+        CacheFile file = mFiles.get(key);
+        if (file == null) {
+            file = new CacheFile(mDirectory, key, expiration);
+        }
+
+        return file;
+    }
+
+    private CacheFile searchCacheFile(String key) {
+        if (!key.matches("^[a-z0-9-_]{1,64}$")) {
+            throw new BadKeyException();
+        }
+
+        if (mDirectory == null) {
+            return null;
+        }
+
+        return mFiles.get(key);
     }
 }

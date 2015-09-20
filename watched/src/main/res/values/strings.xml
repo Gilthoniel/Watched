@@ -8,4 +8,5 @@
     <string name="search_hint">Search …</string>
     <string name="search_button_name">Search</string>
     <string name="title_activity_tv">TV Show</string>
+    <string name="title_activity_movie">MovieActivity</string>
 </resources>

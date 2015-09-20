@@ -5,6 +5,8 @@ import ch.watched.android.service.MessageParser;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Created by gaylor on 09/20/2015.
@@ -49,5 +51,20 @@ public class Utils {
 
             return null;
         }
+    }
+
+    public static <T> String join(Collection<T> collection) {
+        StringBuilder builder = new StringBuilder();
+
+        Iterator<T> it = collection.iterator();
+        while (it.hasNext()) {
+            builder.append(it.next().toString());
+
+            if (it.hasNext()) {
+                builder.append(", ");
+            }
+        }
+
+        return builder.toString();
     }
 }

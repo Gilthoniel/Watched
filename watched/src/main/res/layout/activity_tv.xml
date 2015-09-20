@@ -30,7 +30,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:padding="10dp"
-        android:background="#c8000000"/>
+        android:background="#af000000"/>
 
     <ExpandableListView
         android:layout_width="wrap_content"

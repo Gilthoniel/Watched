@@ -1,6 +1,8 @@
 package ch.watched.android.constants;
 
+import ch.watched.android.fragments.MoviesFragment;
 import ch.watched.android.fragments.ResumeFragment;
+import ch.watched.android.fragments.TVsFragment;
 
 /**
  * Created by gaylor on 08/29/2015.
@@ -13,7 +15,9 @@ public class Constants {
     public static String DB_BASE_URL = "http://api.themoviedb.org/3/";
 
     public static Class<?>[] HOME_FRAGMENTS = new Class<?>[] {
-            ResumeFragment.class
+            ResumeFragment.class,
+            MoviesFragment.class,
+            TVsFragment.class
     };
 
     /* INTENTS */

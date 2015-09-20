@@ -3,18 +3,18 @@
               android:orientation="vertical"
               android:layout_width="150dp"
               android:layout_height="wrap_content"
-                android:background="#ff141414">
+                android:background="#ff141414" android:elevation="10sp">
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="130dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
         android:id="@+id/media_poster"
         android:scaleType="centerCrop"
         android:focusable="false"
         android:clickable="false"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"/>
+            />
 
     <RadioButton
         android:layout_width="wrap_content"

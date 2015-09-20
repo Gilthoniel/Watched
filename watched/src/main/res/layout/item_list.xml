@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:background="#fff5f5f5"
-              style="@style/Theme.AppCompat.Light"
-              android:theme="@style/Theme.AppCompat.Light">
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false">
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,7 +13,7 @@
         android:id="@+id/item_number"
         android:padding="10dp"
         android:textStyle="bold"
-        android:textColor="#ff212121"/>
+            />
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,12 +22,12 @@
         android:id="@+id/item_title"
         android:padding="10dp"
         android:layout_weight="1"
-        android:textColor="#ff212121"
         android:singleLine="true"/>
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/radio_watched"
-        android:checked="false"/>
+        android:checked="false"
+        android:focusable="false"/>
 </LinearLayout>

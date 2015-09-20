@@ -73,7 +73,9 @@ public class SearchTV extends Media implements Serializable {
         throw new UnsupportedOperationException("A search media doesn't fit in the database");
     }
 
-    public class Wrapper {
+    public class Wrapper implements Serializable {
+
+        private static final long serialVersionUID = 938274955204277707L;
 
         public List<SearchTV> results;
     }

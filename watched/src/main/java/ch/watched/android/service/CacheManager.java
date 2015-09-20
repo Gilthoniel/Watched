@@ -2,12 +2,13 @@ package ch.watched.android.service;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import ch.watched.android.service.utils.DiskTimedCache;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
 public class CacheManager {
 
     private static CacheManager instance;
-    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 20; // 20mo
+    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 100; // 100mo
     private static final String DISK_CACHE_NAME = "webcache";
 
     private final Object mDiskCacheLock;
@@ -66,7 +67,7 @@ public class CacheManager {
      * @return the object
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(String key) {
+    public <T extends Serializable> T get(String key) {
 
         synchronized (mDiskCacheLock) {
 
@@ -78,43 +79,14 @@ public class CacheManager {
             } catch (InterruptedException ignored) {}
 
             // Check that the cache's initialization has not failed
-            if (mDiskCache == null) {
+            if (mDiskCache == null || !mDiskCache.contains(key)) {
                 return null;
             }
 
-            DiskTimedCache.Accessor accessor = mDiskCache.get(key);
-
-            if (accessor != null) {
-
-                T object;
-                try {
-                    ObjectInputStream stream = new ObjectInputStream(accessor.getStream());
-
-                    // We know what we put in the cache
-                    object = (T) stream.readObject();
-                } catch (ClassNotFoundException | IOException e) {
-
-                    e.printStackTrace();
-
-                    object = null;
-
-                } finally {
-
-                    accessor.commit();
-                }
-
-                return object;
-            }
+            return (T) mDiskCache.get(key);
         }
-
-        return null;
     }
 
-    /**
-     * Get the image stores with the key, or get a null result
-     * @param key key of the image
-     * @return Bitmap or Null
-     */
     public Bitmap getImage(String key) {
 
         synchronized (mDiskCacheLock) {
@@ -124,24 +96,15 @@ public class CacheManager {
                 while (mDiskCacheStarting) {
                     mDiskCacheLock.wait();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {}
+
+            // Check that the cache's initialization has not failed
+            if (mDiskCache == null || !mDiskCache.contains(key)) {
+                return null;
             }
 
-            DiskTimedCache.Accessor accessor = mDiskCache.get(key);
-
-            if (accessor != null) {
-                InputStream stream = accessor.getStream();
-
-                Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                accessor.commit();
-
-                return bitmap;
-            }
-
+            return mDiskCache.getImage(key);
         }
-
-        return null;
     }
 
     /**
@@ -149,7 +112,7 @@ public class CacheManager {
      * @param key Key of the entry
      * @param object Object : MUST implement Serializable
      */
-    public void add(String key, Object object, int expiration) {
+    public <T extends Object & Serializable> void add(String key, T object, int expiration) {
 
         synchronized (mDiskCacheLock) {
             try {
@@ -159,30 +122,10 @@ public class CacheManager {
                 }
             } catch (InterruptedException ignored) {}
 
-            try {
-                DiskTimedCache.Editor editor = mDiskCache.edit(key, expiration);
-                if (editor != null) {
-                    ObjectOutputStream stream = new ObjectOutputStream(editor.getStream());
-                    stream.writeObject(object);
-                    editor.commit();
-                }
-            } catch (IOException e) {
-
-                e.printStackTrace();
-            }
-
+            mDiskCache.add(key, object, System.currentTimeMillis() + expiration);
         }
     }
 
-    public void add(String key, Object object) {
-        add(key, object, 0);
-    }
-
-    /**
-     * Store an image in the cache
-     * @param key Key of the image
-     * @param bitmap Bitmap format of the image
-     */
     public void add(String key, Bitmap bitmap) {
 
         synchronized (mDiskCacheLock) {
@@ -191,21 +134,42 @@ public class CacheManager {
                 while (mDiskCacheStarting) {
                     mDiskCacheLock.wait();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignored) {}
 
-            DiskTimedCache.Editor editor = mDiskCache.edit(key);
-            if (editor != null) {
-                OutputStream stream = editor.getStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-                editor.commit();
-            }
-
+            mDiskCache.add(key, bitmap);
         }
     }
 
+    /**
+     * Add an object to the cache without expiration time
+     * @param key Key of the object
+     * @param object Must implement Serializable
+     */
+    public <T extends Object & Serializable> void add(String key, T object) {
+        add(key, object, 0);
+    }
+
+    /**
+     * Empty the cache
+     */
+    public void clear() {
+
+        synchronized (mDiskCacheLock) {
+            try {
+                // waiting for initialization of the cache
+                while (mDiskCacheStarting) {
+                    mDiskCacheLock.wait();
+                }
+            } catch (InterruptedException ignored) {}
+
+            mDiskCache.clear();
+        }
+    }
+
+    /**
+     * Helper for the keys of the cache
+     * Keys must correspond to mPattern
+     */
     public static class KeyBuilder {
 
         public static final KeyBuilder instance = new KeyBuilder();
@@ -215,6 +179,7 @@ public class CacheManager {
 
         private KeyBuilder() {
             mPattern = Pattern.compile("([a-zA-Z0-9-_]{1,64})");
+
             mCleaner = Pattern.compile("[^a-zA-Z0-9-_]");
         }
 

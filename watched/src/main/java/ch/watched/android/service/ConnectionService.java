@@ -2,6 +2,7 @@ package ch.watched.android.service;
 
 import android.net.Uri;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +65,7 @@ public class ConnectionService {
      * @param <T> Type of the return object
      * @return An instance of the task (cancellable)
      */
-    public <T> HttpTask<T> executeGetRequest(Uri.Builder builder, RequestCallback<T> callback, String cacheKey) {
+    public <T extends Serializable> HttpTask<T> executeGetRequest(Uri.Builder builder, RequestCallback<T> callback, String cacheKey) {
 
         HttpTask<T> task = new GetTask<>(callback, cacheKey);
         addRequest(task);

@@ -49,6 +49,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.watched.android.HomeActivity" />
         </activity>
+        <activity
+            android:name=".android.MovieActivity"
+            android:label="@string/title_activity_movie"
+            android:parentActivityName=".android.HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.watched.android.HomeActivity" />
+        </activity>
     </application>
 
 </manifest>

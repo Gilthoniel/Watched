@@ -83,6 +83,7 @@ public class BaseWebService extends WebService {
     public void insertMovie(final long id, final MediaSearchAdapter adapter) {
         Uri.Builder builder = getBuilder();
         builder.appendEncodedPath("movie/" + id);
+        builder.appendQueryParameter("append_to_response", "images");
 
         RequestCallback callback = new RequestCallback<Movie>() {
             @Override
