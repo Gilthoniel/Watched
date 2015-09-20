@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="ch.watched.android.TvActivity">
+
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar" />
+
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/flipper"
+        android:autoStart="true"
+        android:animateFirstView="true"
+        android:flipInterval="2000"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TV Show title"
+        android:id="@+id/media_title"
+        android:layout_alignStart="@+id/flipper"
+        android:layout_alignBottom="@+id/flipper"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:padding="10dp"
+        android:background="#c8000000"/>
+
+    <ExpandableListView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/list_episodes"
+        android:layout_below="@+id/flipper"
+        android:layout_centerHorizontal="true"
+        android:choiceMode="multipleChoice"
+        android:dividerHeight="0dp"
+        android:divider="#00000000"/>
+
+</RelativeLayout>

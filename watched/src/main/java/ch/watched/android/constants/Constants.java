@@ -15,4 +15,9 @@ public class Constants {
     public static Class<?>[] HOME_FRAGMENTS = new Class<?>[] {
             ResumeFragment.class
     };
+
+    /* INTENTS */
+
+    public static final String KEY_INDEX = "ch.watched.android.KEY_INDEX";
+    public static final String KEY_MEDIA_ID = "ch.watched.android.KEY_MEDIA_ID";
 }

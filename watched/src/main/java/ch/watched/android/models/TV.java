@@ -2,9 +2,12 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
+import ch.watched.android.constants.Utils;
 import ch.watched.android.database.TVContract;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -29,20 +32,26 @@ public class TV extends Media implements Serializable {
     private String type;
     private float vote_average;
     private List<Season> seasons;
+    private List<Genre> genres;
+    private ImagesWrapper images;
 
     public TV(Cursor cursor) {
-        id = cursor.getInt(0);
-        homepage = cursor.getString(1);
-        in_production = cursor.getInt(2) == 1;
-        original_language = cursor.getString(3);
+        id = cursor.getInt(1);
+        homepage = cursor.getString(2);
+        in_production = cursor.getInt(3) == 1;
         name = cursor.getString(4);
         number_of_episodes = cursor.getInt(5);
         number_of_seasons = cursor.getInt(6);
-        overview = cursor.getString(7);
-        poster_path = cursor.getString(8);
-        vote_average = cursor.getFloat(9);
-        status = cursor.getString(10);
-        type = cursor.getString(11);
+        original_language = cursor.getString(7);
+        original_title = cursor.getString(8);
+        overview = cursor.getString(9);
+        poster_path = cursor.getString(10);
+        status = cursor.getString(11);
+        type = cursor.getString(12);
+        vote_average = cursor.getFloat(13);
+        images = new ImagesWrapper();
+        images.backdrops = Utils.getObject(cursor.getBlob(14), new TypeToken<List<Backdrop>>(){}.getType());
+        genres = Utils.getObject(cursor.getBlob(15), new TypeToken<List<Genre>>(){}.getType());
     }
 
     @Override
@@ -74,6 +83,10 @@ public class TV extends Media implements Serializable {
         return seasons;
     }
 
+    public List<Backdrop> getBackdrops() {
+        return images.backdrops;
+    }
+
     @Override
     public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
@@ -90,6 +103,8 @@ public class TV extends Media implements Serializable {
         values.put(TVContract.TVEntry.COLUMN_SCORE, vote_average);
         values.put(TVContract.TVEntry.COLUMN_STATUS, status);
         values.put(TVContract.TVEntry.COLUMN_TYPE, type);
+        values.put(TVContract.TVEntry.COLUMN_BACKDROPS, Utils.getBytes(images.backdrops));
+        values.put(TVContract.TVEntry.COLUMN_GENRES, Utils.getBytes(genres));
 
         return values;
     }
@@ -99,8 +114,18 @@ public class TV extends Media implements Serializable {
         return TVContract.TVEntry.TABLE_NAME;
     }
 
-    public class Season {
+    public class Season implements Serializable {
+
+        private static final long serialVersionUID = -968718735486066593L;
+
         public long id;
         public int season_number;
+    }
+
+    private class ImagesWrapper implements Serializable {
+
+        private static final long serialVersionUID = 8207420254683451104L;
+
+        private List<Backdrop> backdrops;
     }
 }

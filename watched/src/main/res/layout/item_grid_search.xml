@@ -7,12 +7,11 @@
 
     <ImageView
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="130dp"
         android:id="@+id/media_poster"
         android:scaleType="centerCrop"
         android:focusable="false"
         android:clickable="false"
-        android:minHeight="100dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"/>

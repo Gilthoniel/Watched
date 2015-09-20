@@ -6,22 +6,7 @@ import android.provider.BaseColumns;
  * Created by Gaylor on 07.07.2015.
  */
 public class TVContract {
-    public TVContract() {}
-
-    public static final String[] PROJECTION = new String[] {
-            TVContract.TVEntry.COLUMN_ID,
-            TVContract.TVEntry.COLUMN_HOMEPAGE,
-            TVContract.TVEntry.COLUMN_IN_PROD,
-            TVContract.TVEntry.COLUMN_LANGUAGE,
-            TVContract.TVEntry.COLUMN_NAME,
-            TVContract.TVEntry.COLUMN_NB_EPISODES,
-            TVContract.TVEntry.COLUMN_NB_SEASONS,
-            TVContract.TVEntry.COLUMN_OVERVIEW,
-            TVContract.TVEntry.COLUMN_POSTER,
-            TVContract.TVEntry.COLUMN_SCORE,
-            TVContract.TVEntry.COLUMN_STATUS,
-            TVContract.TVEntry.COLUMN_TYPE
-    };
+    private TVContract() {}
 
     public static abstract class TVEntry implements BaseColumns {
 
@@ -39,6 +24,8 @@ public class TVContract {
         public static final String COLUMN_STATUS = "status";
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_SCORE = "score";
+        public static final String COLUMN_BACKDROPS = "backdrops";
+        public static final String COLUMN_GENRES = "genres";
 
         public static final String SQL_CREATE = "create table "+TABLE_NAME+" (" +
                 _ID + " INTEGER PRIMARY KEY," +
@@ -54,7 +41,9 @@ public class TVContract {
                 COLUMN_POSTER + " TEXT," +
                 COLUMN_STATUS + " TEXT," +
                 COLUMN_TYPE + " TEXT," +
-                COLUMN_SCORE + " NUMBER" +
+                COLUMN_SCORE + " NUMBER," +
+                COLUMN_BACKDROPS + " BLOB," +
+                COLUMN_GENRES + " BLOB" +
                 ");";
 
         public static final String SQL_DELETE = "drop table if exists " + TABLE_NAME;

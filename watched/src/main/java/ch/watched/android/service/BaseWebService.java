@@ -19,52 +19,13 @@ public class BaseWebService extends WebService {
 
     public static final BaseWebService instance = new BaseWebService();
 
-    private static MovieDBConfiguration conf;
-
     private BaseWebService() {}
 
-    /**
-     * Get an image of Movie Database
-     * @param url relative url of the image
-     */
-    public void loadImage(String url) {
-        // Only if the configuration has been loaded because we need it to set the url
-        if (conf != null) {
-            Uri.Builder builder = getBuilder();
-            // base url
-            builder.encodedPath(conf.getUrl());
-            builder.appendEncodedPath(conf.getPosterSize());
-            // image url
-            builder.appendEncodedPath(url);
-
-            ConnectionService.instance.loadImage(builder);
-        } else {
-            Log.e("-- CONF --", "Conf for MovieDB is null");
-        }
-    }
-
-    public void getConfiguration() {
+    public void getConfiguration(RequestCallback<MovieDBConfiguration> callback) {
         Uri.Builder builder = getBuilder();
         builder.appendEncodedPath("configuration");
 
-        RequestCallback callback = new RequestCallback<MovieDBConfiguration>() {
-            @Override
-            public void onSuccess(MovieDBConfiguration result) {
-                conf = result;
-            }
-
-            @Override
-            public void onFailure(Errors error) {
-                Log.e("-- Load Conf --", "Loading configuration fail : "+error.name());
-            }
-
-            @Override
-            public Type getType() {
-                return MovieDBConfiguration.class;
-            }
-        };
-
-        get(builder, callback, null);
+        get(builder, callback, "moviedb_config");
     }
 
     public void searchMovie(String query, final MediaSearchAdapter adapter) {
@@ -133,7 +94,7 @@ public class BaseWebService extends WebService {
             @Override
             public void onFailure(Errors error) {
                 Log.e("-- WebService --", "Result in a failure: " + error);
-                Toast.makeText(adapter.getContext(), "Error when trying to add the movie", Toast.LENGTH_LONG);
+                Toast.makeText(adapter.getContext(), "Error when trying to add the movie", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -148,6 +109,7 @@ public class BaseWebService extends WebService {
     public void insertTV(final long id, final MediaSearchAdapter adapter) {
         Uri.Builder builder = getBuilder();
         builder.appendEncodedPath("tv/" + id);
+        builder.appendQueryParameter("append_to_response", "images");
 
         RequestCallback callback = new RequestCallback<TV>() {
             @Override
@@ -159,7 +121,9 @@ public class BaseWebService extends WebService {
                 // Insert the episodes
                 for (TV.Season season : result.getSeasons()) {
 
-                    BaseWebService.instance.insertSeason(id, season.season_number);
+                    if (season.season_number > 0) {
+                        BaseWebService.instance.insertSeason(id, season.season_number);
+                    }
                 }
 
                 adapter.notifyDataSetChanged();
@@ -168,7 +132,7 @@ public class BaseWebService extends WebService {
             @Override
             public void onFailure(Errors error) {
                 Log.e("-- WebService --", "Result in a failure: " + error);
-                Toast.makeText(adapter.getContext(), "Error when trying to add the tv show", Toast.LENGTH_LONG);
+                Toast.makeText(adapter.getContext(), "Error when trying to add the tv show", Toast.LENGTH_LONG).show();
             }
 
             @Override

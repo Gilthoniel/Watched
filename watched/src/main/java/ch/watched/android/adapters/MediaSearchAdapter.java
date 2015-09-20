@@ -1,32 +1,33 @@
 package ch.watched.android.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import ch.watched.R;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Media;
-import ch.watched.android.service.ImagesManager;
-import ch.watched.android.service.utils.ImageObserver;
+import ch.watched.android.service.ImageLoader;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by gaylor on 08/29/2015.
  *
  */
-public class MediaSearchAdapter extends BaseAdapter implements ImageObserver {
+public class MediaSearchAdapter extends BaseAdapter {
 
     private List<Media> mMedias;
-    private Map<String,Bitmap> mImages;
     private Context mContext;
 
     public MediaSearchAdapter(Context context) {
         mMedias = new LinkedList<>();
-        mImages = new HashMap<>();
 
         mContext = context;
     }
@@ -72,20 +73,9 @@ public class MediaSearchAdapter extends BaseAdapter implements ImageObserver {
         pinned.setText(media.getTitle());
 
         ImageView poster = (ImageView) layout.findViewById(R.id.media_poster);
-        if (mImages.containsKey(media.getPoster())) {
-            poster.setImageBitmap(mImages.get(media.getPoster()));
-        } else {
-            mImages.put(media.getPoster(), null);
-            ImagesManager.getInstance().get(media.getPoster(), this);
-        }
+        poster.setImageBitmap(null);
+        ImageLoader.instance.get(media.getPoster(), poster);
 
         return layout;
-    }
-
-    @Override
-    public void onImageLoaded(String url, Bitmap bitmap) {
-
-        mImages.put(url, bitmap);
-        notifyDataSetChanged();
     }
 }

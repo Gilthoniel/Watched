@@ -5,10 +5,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
 import ch.watched.android.database.MovieContract.MovieEntry;
+import ch.watched.android.database.TVContract.TVEntry;
 import ch.watched.android.models.Episode;
 import ch.watched.android.models.Media;
 import ch.watched.android.models.Movie;
 import ch.watched.android.models.TV;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Gaylor on 02.07.2015.
@@ -39,6 +45,93 @@ public class DatabaseService {
         }
     }
 
+    public List<Movie> getUnwatchMovies() {
+        List<Movie> movies = new LinkedList<>();
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME + " WHERE "+MovieEntry.COLUMN_WATCHED + "=0", null);
+            while (cursor.getCount() > 0 && !cursor.isLast()) {
+                cursor.moveToNext();
+
+                movies.add(new Movie(cursor));
+            }
+
+            cursor.close();
+        }
+
+        return movies;
+    }
+
+    public List<TV> getUnwatchedTVs() {
+        List<TV> series = new LinkedList<>();
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            Cursor cursor = db.rawQuery("SELECT * FROM " + TVContract.TVEntry.TABLE_NAME + " WHERE id IN (" +
+                    "SELECT DISTINCT tv_id FROM " + EpisodeEntry.TABLE_NAME + " WHERE " + EpisodeEntry.COLUMN_WATCHED +
+                    "=0)"
+            , null);
+
+            while (cursor.getCount() > 0 && !cursor.isLast()) {
+                cursor.moveToNext();
+
+                series.add(new TV(cursor));
+            }
+
+            cursor.close();
+        }
+
+        return series;
+    }
+
+    public TV getTV(long id) {
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            try (Cursor cursor = db.rawQuery("SELECT * FROM " + TVEntry.TABLE_NAME + " WHERE id="+id, null)) {
+
+                if (cursor.getCount() > 0) {
+                    cursor.moveToNext();
+
+                    return new TV(cursor);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Map<Integer, List<Episode>> getEpisodes(long tvID) {
+
+        Map<Integer, List<Episode>> episodes = new HashMap<>();
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+
+            String selection = "SELECT * FROM " + EpisodeEntry.TABLE_NAME +
+                    " WHERE " + EpisodeEntry.COLUMN_TV_ID + "=" +tvID +
+                    " ORDER BY " + EpisodeEntry.COLUMN_SEASON_NB + " ASC, " +
+                    EpisodeEntry.COLUMN_EPISODE_NB + " ASC";
+
+            try (Cursor cursor = db.rawQuery(selection, null)) {
+
+                while (cursor.getCount() > 0 && !cursor.isLast()) {
+                    cursor.moveToNext();
+
+                    Episode episode = new Episode(cursor);
+
+                    if (!episodes.containsKey(episode.getSeasonNumber())) {
+                        episodes.put(episode.getSeasonNumber(), new LinkedList<Episode>());
+                    }
+
+                    episodes.get(episode.getSeasonNumber()).add(episode);
+                }
+            }
+        }
+
+        return episodes;
+    }
+
     public long insert(Movie movie) {
 
         return insertMedia(movie);
@@ -57,7 +150,7 @@ public class DatabaseService {
     public int update(Media media) {
 
         try (SQLiteDatabase db = helper.getWritableDatabase()) {
-            return db.update(MovieEntry.TABLE_NAME, media.getSQLValues(), "id=" + media.getID(), null);
+            return db.update(media.getSQLTable(), media.getSQLValues(), "id=" + media.getID(), null);
         }
     }
 

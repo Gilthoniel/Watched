@@ -79,17 +79,4 @@ public class ConnectionService {
 
         return (HttpTask<T>) task.executeOnExecutor(executor, builder);
     }
-
-    /**
-     * Load an image from the url
-     * @param url URL of the image
-     * @return Task
-     */
-    public ImageTask loadImage(Uri.Builder url) {
-
-        ImageTask task = new ImageTask();
-        requests.add(task);
-
-        return (ImageTask) task.executeOnExecutor(executor, url);
-    }
 }

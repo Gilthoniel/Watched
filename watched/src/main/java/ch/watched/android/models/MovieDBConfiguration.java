@@ -1,5 +1,6 @@
 package ch.watched.android.models;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -7,7 +8,9 @@ import java.util.List;
  * Created by Gaylor on 30.06.2015.
  * MovieDB configuration
  */
-public class MovieDBConfiguration {
+public class MovieDBConfiguration implements Serializable {
+
+    private static final long serialVersionUID = -2183465196807646L;
 
     private ImageConf images;
     private List<String> change_keys;
@@ -20,11 +23,19 @@ public class MovieDBConfiguration {
         return images.getPosterSize();
     }
 
-    private class ImageConf {
+    public String getBackdropSize() {
+
+        return images.backdrop_sizes.get(1);
+    }
+
+    private class ImageConf implements Serializable {
+
+        private static final long serialVersionUID = -2183465135396807646L;
 
         private String base_url;
         private String secured_base_url;
         private List<String> poster_sizes;
+        private List<String> backdrop_sizes;
 
         public String getBaseUrl() {
             return base_url;

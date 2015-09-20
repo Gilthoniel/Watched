@@ -20,7 +20,7 @@ public class Movie extends Media implements Serializable {
     private boolean adult;
     private String backdrop_path;
     private List<Integer> genre_ids;
-    private int id;
+    private long id;
     private String original_language;
     private String original_title;
     private String overview;
@@ -31,6 +31,16 @@ public class Movie extends Media implements Serializable {
     private float vote_average;
     private long vote_count;
     private boolean isWatched;
+
+    public Movie(Cursor cursor) {
+        id = cursor.getLong(1);
+        title = cursor.getString(2);
+        isWatched = cursor.getInt(3) == 1;
+        overview = cursor.getString(4);
+        vote_average = cursor.getFloat(5);
+        poster_path = cursor.getString(6);
+        release_date = cursor.getString(7);
+    }
 
     @Override
     public long getID() {
@@ -69,6 +79,10 @@ public class Movie extends Media implements Serializable {
 
     public String getDate() {
         return release_date;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
     }
 
     @Override

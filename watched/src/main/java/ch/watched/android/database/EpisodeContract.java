@@ -7,20 +7,7 @@ import android.provider.BaseColumns;
  * Episodes table for the database
  */
 public class EpisodeContract {
-    public EpisodeContract(){}
-
-    public static final String[] PROJECTION = new String[] {
-            EpisodeEntry.COLUMN_EPISODE_ID,
-            EpisodeEntry.COLUMN_DATE,
-            EpisodeEntry.COLUMN_EPISODE_NB,
-            EpisodeEntry.COLUMN_NAME,
-            EpisodeEntry.COLUMN_OVERVIEW,
-            EpisodeEntry.COLUMN_SCORE,
-            EpisodeEntry.COLUMN_SEASON_NB,
-            EpisodeEntry.COLUMN_STILL_PATH,
-            EpisodeEntry.COLUMN_TV_ID,
-            EpisodeEntry.COLUMN_WATCHED
-    };
+    private EpisodeContract(){}
 
     public static abstract class EpisodeEntry implements BaseColumns {
         public static final String TABLE_NAME = "episod";

@@ -58,7 +58,7 @@ public class NavigationAdapter extends BaseAdapter {
             layout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_navigation, parent, false);
         }
 
-        ((TextView) layout.findViewById(R.id.item_title)).setText(mFragments.get(i).getTitle());
+        ((TextView) layout.findViewById(R.id.item_title)).setText(getItem(i).getTitle());
 
         return layout;
     }

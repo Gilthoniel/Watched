@@ -39,6 +39,7 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
+            setTitle(mQuery);
         }
 
         /* Toolbar */
@@ -48,7 +49,7 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle(mQuery);
+        getSupportActionBar().setElevation(0);
     }
 
     public String getQuery() {

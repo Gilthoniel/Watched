@@ -7,12 +7,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".android.BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".android.BaseApplication">
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".android.HomeActivity"
             android:label="@string/title_activity_home"
@@ -27,12 +26,10 @@
                 android:name="android.app.default_searchable"
                 android:value=".android.SearchActivity" />
         </activity>
-
         <activity
             android:name=".android.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".android.HomeActivity" >
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -44,7 +41,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".android.HomeActivity" />
         </activity>
-
+        <activity
+            android:name=".android.TvActivity"
+            android:label="@string/title_activity_tv"
+            android:parentActivityName=".android.HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.watched.android.HomeActivity" />
+        </activity>
     </application>
 
 </manifest>
