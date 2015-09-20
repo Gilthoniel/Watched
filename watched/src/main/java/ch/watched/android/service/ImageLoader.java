@@ -63,6 +63,10 @@ public class ImageLoader {
         });
     }
 
+    public void cancel() {
+        mViews.clear();
+    }
+
     public void get(final String url, final ImageView image, ImageType type) {
         if (url == null || image == null) {
             return;
@@ -84,7 +88,7 @@ public class ImageLoader {
             mViews.get(url).add(image);
         }
 
-        new ImageTask(type).execute(url);
+        new ImageTask(type).executeOnExecutor(ConnectionService.instance.getExecutor(), url);
     }
 
     public void get(final String url, final ImageView image) {
@@ -168,9 +172,11 @@ public class ImageLoader {
                     mImages.remove(key);
                 }
 
-                for (ImageView view : mViews.get(mUrl)) {
-                    view.setImageBitmap(bitmap);
-                    view.invalidate();
+                if (mViews.containsKey(mUrl)) {
+                    for (ImageView view : mViews.get(mUrl)) {
+                        view.setImageBitmap(bitmap);
+                        view.invalidate();
+                    }
                 }
 
             } else {

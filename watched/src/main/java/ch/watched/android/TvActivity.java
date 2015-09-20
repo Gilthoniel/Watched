@@ -93,6 +93,13 @@ public class TvActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        ImageLoader.instance.cancel();
+    }
+
+    @Override
     public void onPostCreate(Bundle states) {
         super.onPostCreate(states);
 

@@ -77,6 +77,13 @@ public class MovieActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        ImageLoader.instance.cancel();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle states) {
         super.onSaveInstanceState(states);
 

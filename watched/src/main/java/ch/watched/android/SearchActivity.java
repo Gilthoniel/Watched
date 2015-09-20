@@ -11,15 +11,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import ch.watched.R;
 import ch.watched.android.adapters.SearchPagerAdapter;
+import ch.watched.android.constants.Constants;
+import ch.watched.android.service.ImageLoader;
 import ch.watched.android.views.SlidingTabLayout;
 
 public class SearchActivity extends AppCompatActivity {
 
     private String mQuery;
 
+    public String getQuery() {
+        return mQuery;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle states) {
+        super.onCreate(states);
         setContentView(R.layout.activity_search);
 
         ViewPager mPager = (ViewPager) findViewById(R.id.pager);
@@ -37,10 +43,14 @@ public class SearchActivity extends AppCompatActivity {
         mTabs.setViewPager(mPager);
 
         Intent intent = getIntent();
-        if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+        if (intent != null &&intent.getAction().equals(Intent.ACTION_SEARCH)) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
-            setTitle(mQuery);
+        } else if (states != null) {
+            mQuery = states.getString(Constants.KEY_SEARCH);
+        } else {
+            mQuery = "";
         }
+        setTitle(mQuery);
 
         /* Toolbar */
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -52,8 +62,18 @@ public class SearchActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
     }
 
-    public String getQuery() {
-        return mQuery;
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        ImageLoader.instance.cancel();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle states) {
+        super.onSaveInstanceState(states);
+
+        states.putString(Constants.KEY_SEARCH, mQuery);
     }
 
     @Override

@@ -24,4 +24,6 @@ public class Constants {
 
     public static final String KEY_INDEX = "ch.watched.android.KEY_INDEX";
     public static final String KEY_MEDIA_ID = "ch.watched.android.KEY_MEDIA_ID";
+    public static final String KEY_SEARCH = "ch.watched.android.KEY_SEARCH";
+
 }
