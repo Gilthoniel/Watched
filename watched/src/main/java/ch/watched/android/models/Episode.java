@@ -5,6 +5,7 @@ import android.database.Cursor;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.EpisodeContract;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
+import ch.watched.android.database.WatcherDbHelper;
 
 import java.io.Serializable;
 
@@ -97,7 +98,7 @@ public class Episode extends Media implements Serializable {
     @Override
     public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
-        values.put(EpisodeEntry.COLUMN_EPISODE_ID, id);
+        values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(EpisodeEntry.COLUMN_DATE, air_date);
         values.put(EpisodeEntry.COLUMN_EPISODE_NB, episode_number);
         values.put(EpisodeEntry.COLUMN_NAME, name);
@@ -106,7 +107,7 @@ public class Episode extends Media implements Serializable {
         values.put(EpisodeEntry.COLUMN_STILL_PATH, still_path);
         values.put(EpisodeEntry.COLUMN_SCORE, vote_average);
         values.put(EpisodeEntry.COLUMN_TV_ID, tv_id);
-        values.put(EpisodeEntry.COLUMN_WATCHED, watched);
+        values.put(WatcherDbHelper.COLUMN_WATCHED, watched);
 
         return values;
     }

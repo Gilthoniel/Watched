@@ -1,6 +1,8 @@
 package ch.watched.android;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,15 +14,22 @@ import android.widget.*;
 import ch.watched.R;
 import ch.watched.android.adapters.EpisodeExpandableAdapter;
 import ch.watched.android.constants.Constants;
+import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Backdrop;
+import ch.watched.android.models.Episode;
 import ch.watched.android.models.TV;
+import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.ConnectionService;
 import ch.watched.android.service.ImageLoader;
+
+import java.util.List;
 
 public class TvActivity extends AppCompatActivity {
 
     private EpisodeExpandableAdapter mAdapter;
     private ExpandableListView mEpisodes;
+    private Dialog mDialog;
     private long mID;
     private TV mTV;
 
@@ -90,6 +99,8 @@ public class TvActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        mDialog = Utils.createProgressDialog(TvActivity.this);
     }
 
     @Override
@@ -137,8 +148,51 @@ public class TvActivity extends AppCompatActivity {
                 finish();
                 return true;
 
+            case R.id.action_refresh:
+
+                BaseWebService.instance.updateTV(mTV, new BaseWebService.Callable() {
+                    @Override
+                    public void call() {
+                        recreate();
+                        Toast.makeText(getApplicationContext(), "TV Show updated!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return true;
+
+            case R.id.action_watched:
+
+                markAllEpisodes();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void markAllEpisodes() {
+
+        // Progress dialog
+        mDialog.show();
+
+        new ActionTask().executeOnExecutor(ConnectionService.instance.getExecutor());
+    }
+
+    private class ActionTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            List<Episode> episodes = mAdapter.getEpisodes();
+            for (Episode episode : episodes) {
+                episode.setWatched(true);
+            }
+
+            return null;
+        }
+
+        @Override
+        public void onPostExecute(Void aVoid) {
+            mAdapter.notifyDataSetChanged();
+            mDialog.dismiss();
         }
     }
 }

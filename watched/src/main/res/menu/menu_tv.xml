@@ -4,9 +4,21 @@
       tools:context="ch.watched.android.TvActivity">
 
     <item
+            android:id="@+id/action_refresh"
+            android:title="Refresh"
+            android:icon="@drawable/action_refresh"
+            app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_remove"
         android:title="Remove"
         android:icon="@drawable/action_delete"
         app:showAsAction="ifRoom" />
+
+    <item
+            android:id="@+id/action_watched"
+            android:title="Mark all watched"
+            android:icon="@drawable/action_watched"
+            app:showAsAction="ifRoom" />
 
 </menu>

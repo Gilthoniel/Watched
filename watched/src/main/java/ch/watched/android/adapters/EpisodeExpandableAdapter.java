@@ -38,6 +38,16 @@ public class EpisodeExpandableAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
+    public List<Episode> getEpisodes() {
+        List<Episode> episodes = new LinkedList<>();
+
+        for (List<Episode> list : mEpisodes.values()) {
+            episodes.addAll(list);
+        }
+
+        return episodes;
+    }
+
     @Override
     public int getGroupCount() {
         return mSeasons.size();

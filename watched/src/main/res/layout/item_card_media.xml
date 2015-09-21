@@ -11,10 +11,10 @@
         android:layout_width="300dp"
         android:layout_height="150dp"
         card_view:cardCornerRadius="0dp"
-        card_view:cardBackgroundColor="#fff5f5f5"
+        card_view:cardBackgroundColor="#ff141414"
         card_view:cardElevation="10sp"
         card_view:contentPadding="0dp"
-        android:layout_margin="20dp">
+        android:layout_margin="10dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -37,7 +37,7 @@
                 android:padding="5dp"
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/media_poster"
-                android:textColor="#ff212121"/>
+                    />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -46,13 +46,26 @@
                 android:id="@+id/media_overview"
                 android:layout_below="@+id/media_title"
                 android:layout_alignStart="@+id/media_title"
-                android:textColor="#ff373737"
                 android:textSize="12sp"
                 android:textStyle="italic"
                 android:padding="5dp"
                 android:layout_alignParentEnd="true"
                 android:ellipsize="end"
-                android:maxLines="5"/>
+                android:maxLines="4"/>
+            <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/button_next" android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true" android:src="@drawable/action_watched"
+                    android:scaleType="centerCrop"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Season 1 - Episode 1"
+                    android:id="@+id/next_episode" android:layout_alignParentBottom="true"
+                    android:layout_toEndOf="@+id/media_poster" android:layout_alignTop="@+id/button_next"
+                    android:layout_toLeftOf="@+id/button_next" android:gravity="center_vertical"
+                    android:padding="10dp" android:textSize="12sp"/>
 
         </RelativeLayout>
 

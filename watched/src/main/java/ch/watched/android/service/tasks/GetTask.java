@@ -14,10 +14,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created by gaylor on 27.07.15.
@@ -25,7 +21,6 @@ import java.util.concurrent.Future;
  */
 public class GetTask<T extends Serializable> extends HttpTask<T> {
 
-    private Future<T> mFuture;
     private RequestCallback<T> callback;
     private RequestCallback.Errors error;
     private String mKey;
@@ -35,19 +30,6 @@ public class GetTask<T extends Serializable> extends HttpTask<T> {
 
         error = RequestCallback.Errors.SUCCESS;
         mKey = cacheKey;
-
-        mFuture = null;
-    }
-
-    @Override
-    public void cancel() {
-
-        if (mFuture != null) {
-            mFuture.cancel(true);
-            Log.d("__FUTURE__", "Future cancelled");
-        }
-
-        super.cancel(true);
     }
 
     @Override
@@ -65,44 +47,35 @@ public class GetTask<T extends Serializable> extends HttpTask<T> {
         }
 
         try {
+
+            if (isCancelled()) return null;
+
             URL url = new URL(builders[0].build().toString());
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             Log.d("__INTERNET__", "Connection open for params:" + url);
 
-            try {
-                mFuture = ConnectionService.instance.getExecutor().submit(new Callable<T>() {
-                    @Override
-                    public T call() throws Exception {
+                try {
 
-                        try {
+                    if (isCancelled()) return null;
 
-                            T object = MessageParser.fromJson(new InputStreamReader(connection.getInputStream()), callback.getType());
-                            if (object != null && mKey != null) {
-                                CacheManager.instance().add(mKey, object, Constants.CACHE_EXPIRATION_TIME);
-                            }
+                    T object = MessageParser.fromJson(new InputStreamReader(connection.getInputStream()), callback.getType());
 
-                            return object;
+                    if (isCancelled()) return null;
 
-                        } catch (JsonSyntaxException e) {
-
-                            error = RequestCallback.Errors.JSON;
-                            Log.e("Json error", "Message: " + e.getMessage());
-
-                        }
-
-                        return null;
+                    if (object != null && mKey != null) {
+                        CacheManager.instance().add(mKey, object, Constants.CACHE_EXPIRATION_TIME);
                     }
-                });
 
-                return mFuture.get();
+                    return object;
 
-            }  catch (InterruptedException | ExecutionException | CancellationException ignored) {
+                } catch (JsonSyntaxException e) {
 
-                Log.e("__FUTURE__", "Class: "+ignored.getMessage());
-            } finally {
+                    error = RequestCallback.Errors.JSON;
+                    Log.e("Json error", "Message: " + e.getMessage());
 
-                connection.disconnect();
-            }
+                } finally {
+                    connection.disconnect();
+                }
 
         } catch (IOException e) {
 

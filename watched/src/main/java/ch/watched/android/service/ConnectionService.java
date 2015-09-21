@@ -52,7 +52,7 @@ public class ConnectionService {
      */
     public void cancel() {
         for (HttpTask<?> task : requests) {
-            task.cancel();
+            task.cancel(true);
         }
 
         requests.clear();

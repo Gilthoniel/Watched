@@ -13,6 +13,9 @@ public class WatcherDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "Watcher.db";
 
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_WATCHED = "watched";
+
     public WatcherDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

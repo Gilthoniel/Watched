@@ -16,7 +16,10 @@ import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Backdrop;
 import ch.watched.android.models.Movie;
+import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.ImageLoader;
+
+import java.util.concurrent.Callable;
 
 
 public class MovieActivity extends AppCompatActivity {
@@ -112,6 +115,18 @@ public class MovieActivity extends AppCompatActivity {
                 mMovie.setWatched(!mMovie.isWatched());
                 checkIcon();
                 return true;
+
+            case R.id.action_refresh:
+
+                BaseWebService.instance.updateMovie(mMovie, new BaseWebService.Callable() {
+                    @Override
+                    public void call() {
+                        recreate();
+                        Toast.makeText(getApplicationContext(), "Movie updated!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -6,6 +6,7 @@ import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.MovieContract;
 import ch.watched.android.database.MovieContract.MovieEntry;
+import ch.watched.android.database.WatcherDbHelper;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
@@ -104,11 +105,17 @@ public class Movie extends Media implements Serializable {
     }
 
     @Override
+    public boolean next() {
+        setWatched(true);
+        return true;
+    }
+
+    @Override
     public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
-        values.put(MovieEntry.COLUMN_MOVIE_ID, id);
+        values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(MovieEntry.COLUMN_TITLE, title);
-        values.put(MovieEntry.COLUMN_WATCHED, isWatched);
+        values.put(WatcherDbHelper.COLUMN_WATCHED, isWatched);
         values.put(MovieEntry.COLUMN_OVERVIEW, overview);
         values.put(MovieEntry.COLUMN_IMAGE, poster_path);
         values.put(MovieEntry.COLUMN_RELEASE, release_date);

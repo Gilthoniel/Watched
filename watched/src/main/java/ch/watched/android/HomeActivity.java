@@ -28,7 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     private NavigationAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private int mCurrentIndex = 0;
+    private int mCurrentIndex;
 
     @Override
     protected void onCreate(Bundle states) {
@@ -37,6 +37,8 @@ public class HomeActivity extends AppCompatActivity {
 
         if (states != null) {
             mCurrentIndex = states.getInt(Constants.KEY_INDEX);
+        } else {
+            mCurrentIndex = 0;
         }
 
         /* Navigation Drawer */

@@ -1,5 +1,8 @@
 package ch.watched.android.constants;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.util.Log;
 import ch.watched.android.service.MessageParser;
 
@@ -66,5 +69,15 @@ public class Utils {
         }
 
         return builder.toString();
+    }
+
+    public static Dialog createProgressDialog(Context context) {
+        ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setIndeterminate(true);
+        dialog.setTitle("Please wait...");
+        dialog.setMessage("Downloading data...");
+        dialog.setCancelable(false);
+
+        return dialog;
     }
 }

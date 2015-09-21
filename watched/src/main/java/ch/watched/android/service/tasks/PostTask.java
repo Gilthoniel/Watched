@@ -17,7 +17,7 @@ import java.util.concurrent.*;
  *
  */
 public class PostTask extends HttpTask<Boolean> {
-    private Future<Boolean> mFuture;
+
     private RequestCallback<Boolean> callback;
     private RequestCallback.Errors error;
 
@@ -25,19 +25,6 @@ public class PostTask extends HttpTask<Boolean> {
         this.callback = callback;
 
         error = RequestCallback.Errors.SUCCESS;
-
-        mFuture = null;
-    }
-
-    @Override
-    public void cancel() {
-
-        if (mFuture != null) {
-            mFuture.cancel(true);
-            Log.d("__FUTURE__", "Future cancelled");
-        }
-
-        super.cancel(true);
     }
 
     @Override
@@ -51,44 +38,30 @@ public class PostTask extends HttpTask<Boolean> {
             final Uri uri = builders[0].build();
             URL url = new URL(uri.getPath());
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            Log.d("__INTERNET__", "Post request with params:" + uri);
-
-            mFuture = ConnectionService.instance.getExecutor().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    try {
-
-                        String body = uri.getEncodedQuery();
-                        connection.setDoOutput(true);
-                        connection.setFixedLengthStreamingMode(body.length());
-
-                        OutputStream output = connection.getOutputStream();
-                        IOUtils.write(body, output, "UTF-8");
-                        output.flush();
-                        output.close();
-
-                        return connection.getResponseCode() == 200;
-
-                    } catch (IOException e) {
-
-                        Log.e("__POST__", "IOException during POST request : " + e.getStackTrace()[0]);
-
-                        return false;
-                    } finally {
-
-                        if (connection != null) {
-                            connection.disconnect();
-                        }
-                    }
-                }
-            });
 
             try {
-                return mFuture.get();
 
-            } catch (CancellationException | ExecutionException | InterruptedException ignored) {} finally {
+                String body = uri.getEncodedQuery();
+                connection.setDoOutput(true);
+                connection.setFixedLengthStreamingMode(body.length());
 
-                connection.disconnect();
+                OutputStream output = connection.getOutputStream();
+                IOUtils.write(body, output, "UTF-8");
+                output.flush();
+                output.close();
+
+                return connection.getResponseCode() == 200;
+
+            } catch (IOException e) {
+
+                Log.e("__POST__", "IOException during POST request : " + e.getStackTrace()[0]);
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
             }
         } catch (IOException e) {
 

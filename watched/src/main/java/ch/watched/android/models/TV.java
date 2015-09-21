@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 import ch.watched.android.constants.Utils;
+import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.TVContract;
+import ch.watched.android.database.WatcherDbHelper;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -88,9 +90,27 @@ public class TV extends Media implements Serializable {
     }
 
     @Override
+    public String getNextMedia() {
+
+        Episode episode = DatabaseService.getInstance().getUnwatchedEpisode(id);
+        return "Season " + episode.getSeasonNumber() + " - Episode " + episode.getEpisodeNumber();
+    }
+
+    @Override
+    public boolean next() {
+
+        Episode episode = DatabaseService.getInstance().getUnwatchedEpisode(id);
+        if (episode != null) {
+            episode.setWatched(true);
+        }
+
+        return DatabaseService.getInstance().getEpisodes(id) == null;
+    }
+
+    @Override
     public ContentValues getSQLValues() {
         ContentValues values = new ContentValues();
-        values.put(TVContract.TVEntry.COLUMN_ID, id);
+        values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(TVContract.TVEntry.COLUMN_HOMEPAGE, homepage);
         values.put(TVContract.TVEntry.COLUMN_IN_PROD, in_production ? 1 : 0);
         values.put(TVContract.TVEntry.COLUMN_LANGUAGE, original_language);

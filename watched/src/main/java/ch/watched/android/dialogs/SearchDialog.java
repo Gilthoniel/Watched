@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import ch.watched.R;
 import ch.watched.android.adapters.MediaSearchAdapter;
+import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.MovieContract;
 import ch.watched.android.models.Media;
@@ -68,6 +69,7 @@ public class SearchDialog extends DialogFragment {
             builder.setPositiveButton("Pinned", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
+
                     if (mMedia.getSQLTable().equals(MovieContract.MovieEntry.TABLE_NAME)) {
                         BaseWebService.instance.insertMovie(mMedia.getID(), mAdapter);
                     } else {

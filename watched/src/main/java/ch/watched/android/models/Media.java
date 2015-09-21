@@ -14,6 +14,18 @@ public abstract class Media {
     public abstract float getRating();
     public abstract String getOverview();
 
+    public String getNextMedia() {
+        return "";
+    }
+
+    /**
+     * Mark the nearest unwatched media as watched
+     * @return return true if there's no more to watch for this media
+     */
+    public boolean next() {
+        return false;
+    }
+
     public abstract String getSQLTable();
 
     public abstract ContentValues getSQLValues();

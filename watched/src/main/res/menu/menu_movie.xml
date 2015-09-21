@@ -3,11 +3,17 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="ch.watched.android.MovieActivity">
 
-      <item
-          android:id="@+id/action_remove"
-          android:title="Remove"
-          android:icon="@drawable/action_delete"
-          app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_refresh"
+        android:title="Refresh"
+        android:icon="@drawable/action_refresh"
+        app:showAsAction="ifRoom" />
+
+    <item
+      android:id="@+id/action_remove"
+      android:title="Remove"
+      android:icon="@drawable/action_delete"
+      app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_seen"

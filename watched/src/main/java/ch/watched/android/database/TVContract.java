@@ -4,6 +4,7 @@ import android.provider.BaseColumns;
 
 /**
  * Created by Gaylor on 07.07.2015.
+ *
  */
 public class TVContract {
     private TVContract() {}
@@ -11,7 +12,6 @@ public class TVContract {
     public static abstract class TVEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "tv";
-        public static final String COLUMN_ID = "id";
         public static final String COLUMN_HOMEPAGE = "homepage";
         public static final String COLUMN_IN_PROD = "in_prod";
         public static final String COLUMN_NAME = "name";
@@ -29,7 +29,7 @@ public class TVContract {
 
         public static final String SQL_CREATE = "create table "+TABLE_NAME+" (" +
                 _ID + " INTEGER PRIMARY KEY," +
-                COLUMN_ID + " INTEGER NOT NULL UNIQUE," +
+                WatcherDbHelper.COLUMN_ID + " INTEGER NOT NULL UNIQUE," +
                 COLUMN_HOMEPAGE + " TEXT," +
                 COLUMN_IN_PROD + " NUMBER," +
                 COLUMN_NAME + " TEXT, " +

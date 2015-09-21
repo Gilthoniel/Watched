@@ -13,8 +13,6 @@ import java.util.concurrent.Future;
  */
 public abstract class HttpTask<T> extends AsyncTask<Uri.Builder, Void, T> {
 
-    public abstract void cancel();
-
     @Override
     protected abstract T doInBackground(Uri.Builder... builders);
 }
