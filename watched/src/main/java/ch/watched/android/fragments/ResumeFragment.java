@@ -1,17 +1,15 @@
 package ch.watched.android.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import ch.watched.R;
 import ch.watched.android.MovieActivity;
 import ch.watched.android.TvActivity;
-import ch.watched.android.adapters.MediaCardAdapter;
-import ch.watched.android.constants.Constants;
+import ch.watched.android.adapters.PagerCardAdapter;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Movie;
 import ch.watched.android.models.TV;
@@ -22,8 +20,8 @@ import ch.watched.android.models.TV;
  */
 public class ResumeFragment extends HomeFragment {
 
-    private MediaCardAdapter<Movie> mMoviesAdapter;
-    private MediaCardAdapter<TV> mSeriesAdapter;
+    private PagerCardAdapter<Movie> mMoviesAdapter;
+    private PagerCardAdapter<TV> mSeriesAdapter;
 
     public String getTitle() {
         return "Selections";
@@ -49,42 +47,26 @@ public class ResumeFragment extends HomeFragment {
             return;
         }
 
-        RecyclerView movies = (RecyclerView) getView().findViewById(R.id.recycler_movies);
-        movies.setHasFixedSize(true);
-
-        LinearLayoutManager moviesManager = new LinearLayoutManager(getContext());
-        moviesManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        movies.setLayoutManager(moviesManager);
-
-        mMoviesAdapter = new MediaCardAdapter<>(DatabaseService.getInstance().getUnwatchMovies());
-        mMoviesAdapter.setOnItemClickListener(new MediaCardAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Intent intent = new Intent(getContext(), MovieActivity.class);
-                intent.putExtra(Constants.KEY_INDEX, mMoviesAdapter.getItemId(position));
-
-                startActivity(intent);
-            }
-        });
+        ViewPager movies = (ViewPager) getView().findViewById(R.id.pager_movies);
+        mMoviesAdapter = new PagerCardAdapter<>(DatabaseService.getInstance().getUnwatchMovies(), MovieActivity.class);
+        mMoviesAdapter.addSeekBar((SeekBar) getView().findViewById(R.id.seekbar_movies));
         movies.setAdapter(mMoviesAdapter);
-
-        RecyclerView series = (RecyclerView) getView().findViewById(R.id.recycler_series);
-        series.setHasFixedSize(true);
-
-        LinearLayoutManager seriesManager = new LinearLayoutManager(getContext());
-        seriesManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        series.setLayoutManager(seriesManager);
-
-        mSeriesAdapter = new MediaCardAdapter<>(DatabaseService.getInstance().getUnwatchedTVs());
-        mSeriesAdapter.setOnItemClickListener(new MediaCardAdapter.OnItemClickListener() {
+        movies.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
-            public void onClick(View view, int position) {
-                Intent intent = new Intent(getActivity(), TvActivity.class);
-                intent.putExtra(Constants.KEY_MEDIA_ID, mSeriesAdapter.getItemId(position));
-
-                startActivity(intent);
+            public void onPageSelected(int position) {
+                mMoviesAdapter.updateSeekBars(position);
             }
         });
+
+        ViewPager series = (ViewPager) getView().findViewById(R.id.pager_series);
+        mSeriesAdapter = new PagerCardAdapter<>(DatabaseService.getInstance().getUnwatchedTVs(), TvActivity.class);
+        mSeriesAdapter.addSeekBar((SeekBar) getView().findViewById(R.id.seekbar_series));
         series.setAdapter(mSeriesAdapter);
+        series.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                mSeriesAdapter.updateSeekBars(position);
+            }
+        });
     }
 }

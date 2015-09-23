@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ColorPrimary">#ff326ebe</color>
-    <color name="ColorPrimaryDark">#ff2f4c98</color>
-    <color name="tabsScrollColor">#ff164664</color>
-
-    <!-- Color for the comparison -->
-    <color name="appColor">#ff393939</color>
-    <color name="comparisonColor">#FF4FBBDE</color>
-
-    <!-- Color for the reviews -->
-    <color name="reviewTitleColor">#ff000000</color>
+    <color name="ColorPrimary">#ffbe3321</color>
+    <color name="ColorPrimaryDark">#ff981713</color>
+    <color name="tabsScrollColor">#ff640d07</color>
+    <color name="ColorItems">#ffbe3321</color>
 </resources>

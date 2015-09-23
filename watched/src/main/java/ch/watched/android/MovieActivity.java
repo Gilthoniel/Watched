@@ -37,9 +37,9 @@ public class MovieActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null) {
-            mID = intent.getLongExtra(Constants.KEY_INDEX, 0);
+            mID = intent.getLongExtra(Constants.KEY_MEDIA_ID, 0);
         } else if (states != null) {
-            mID = states.getLong(Constants.KEY_INDEX);
+            mID = states.getLong(Constants.KEY_MEDIA_ID);
         } else {
             mID = 0;
         }
@@ -90,7 +90,7 @@ public class MovieActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle states) {
         super.onSaveInstanceState(states);
 
-        states.putLong(Constants.KEY_INDEX, mID);
+        states.putLong(Constants.KEY_MEDIA_ID, mID);
     }
 
     @Override

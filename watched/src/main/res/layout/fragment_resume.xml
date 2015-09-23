@@ -12,13 +12,16 @@
         android:layout_gravity="center_horizontal"
         android:padding="10dp" android:textStyle="bold" android:textSize="20sp"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/recycler_movies"
-        android:layout_weight="1"
-        android:scrollbars="horizontal"/>
+    <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/pager_movies" android:layout_weight="1"/>
 
+    <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekbar_movies" android:layout_gravity="center_horizontal" android:max="0"
+            android:progress="0" android:layout_marginLeft="30dp" android:layout_marginRight="30dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,10 +30,14 @@
         android:layout_gravity="center_horizontal"
         android:padding="10dp" android:textSize="20sp" android:textStyle="bold"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/recycler_series"
-        android:layout_weight="1"
-        android:scrollbars="horizontal"/>
+    <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/pager_series" android:layout_weight="1"/>
+    <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekbar_series" android:layout_gravity="center_horizontal" android:indeterminate="false"
+            android:max="0" android:progress="0" android:layout_marginLeft="30dp" android:layout_marginRight="30dp"/>
+
 </LinearLayout>

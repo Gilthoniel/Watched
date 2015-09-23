@@ -55,7 +55,7 @@ public class MoviesFragment extends HomeFragment {
             public boolean onChildClick(ExpandableListView expandableListView, View view, int group, int position, long l) {
 
                 Intent intent = new Intent(getContext(), MovieActivity.class);
-                intent.putExtra(Constants.KEY_INDEX, mAdapter.getChild(group, position).getID());
+                intent.putExtra(Constants.KEY_MEDIA_ID, mAdapter.getChild(group, position).getID());
 
                 startActivity(intent);
 
