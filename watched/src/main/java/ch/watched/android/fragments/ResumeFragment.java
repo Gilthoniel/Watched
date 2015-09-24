@@ -13,6 +13,7 @@ import ch.watched.android.adapters.PagerCardAdapter;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Movie;
 import ch.watched.android.models.TV;
+import ch.watched.android.views.PaginationView;
 
 /**
  * Created by gaylor on 09/19/2015.
@@ -49,24 +50,16 @@ public class ResumeFragment extends HomeFragment {
 
         ViewPager movies = (ViewPager) getView().findViewById(R.id.pager_movies);
         mMoviesAdapter = new PagerCardAdapter<>(DatabaseService.getInstance().getUnwatchMovies(), MovieActivity.class);
-        mMoviesAdapter.addSeekBar((SeekBar) getView().findViewById(R.id.seekbar_movies));
         movies.setAdapter(mMoviesAdapter);
-        movies.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                mMoviesAdapter.updateSeekBars(position);
-            }
-        });
+
+        PaginationView paginationMovies = (PaginationView) getView().findViewById(R.id.pagination_movies);
+        paginationMovies.setViewPager(movies);
 
         ViewPager series = (ViewPager) getView().findViewById(R.id.pager_series);
         mSeriesAdapter = new PagerCardAdapter<>(DatabaseService.getInstance().getUnwatchedTVs(), TvActivity.class);
-        mSeriesAdapter.addSeekBar((SeekBar) getView().findViewById(R.id.seekbar_series));
         series.setAdapter(mSeriesAdapter);
-        series.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                mSeriesAdapter.updateSeekBars(position);
-            }
-        });
+
+        PaginationView paginationSeries = (PaginationView) getView().findViewById(R.id.pagination_series);
+        paginationSeries.setViewPager(series);
     }
 }

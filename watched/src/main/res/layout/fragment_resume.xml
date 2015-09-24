@@ -17,11 +17,13 @@
             android:layout_height="fill_parent"
             android:id="@+id/pager_movies" android:layout_weight="1"/>
 
-    <SeekBar
+    <ch.watched.android.views.PaginationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/seekbar_movies" android:layout_gravity="center_horizontal" android:max="0"
-            android:progress="0" android:layout_marginLeft="30dp" android:layout_marginRight="30dp"/>
+            android:id="@+id/pagination_movies"
+            android:orientation="horizontal"
+            android:gravity="center" android:padding="10dp"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,10 +36,11 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:id="@+id/pager_series" android:layout_weight="1"/>
-    <SeekBar
+
+    <ch.watched.android.views.PaginationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/seekbar_series" android:layout_gravity="center_horizontal" android:indeterminate="false"
-            android:max="0" android:progress="0" android:layout_marginLeft="30dp" android:layout_marginRight="30dp"/>
-
+            android:id="@+id/pagination_series"
+            android:orientation="horizontal"
+            android:gravity="center" android:padding="10dp"/>
 </LinearLayout>

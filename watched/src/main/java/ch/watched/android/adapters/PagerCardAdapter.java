@@ -6,16 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import ch.watched.R;
 import ch.watched.android.constants.Constants;
 import ch.watched.android.models.Media;
 import ch.watched.android.service.ImageLoader;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Gaylor on 23.09.2015.
@@ -24,12 +21,10 @@ import java.util.Set;
 public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
     List<T> mMedias;
-    Set<SeekBar> mSeekBars;
     Class<?> mClass;
 
     public PagerCardAdapter(List<T> medias, Class<?> activity) {
         mMedias = medias;
-        mSeekBars = new HashSet<>();
         mClass = activity;
     }
 
@@ -38,35 +33,6 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
         mMedias.addAll(medias);
 
         notifyDataSetChanged();
-    }
-
-    public void addSeekBar(SeekBar seekBar) {
-        mSeekBars.add(seekBar);
-
-        seekBar.setMax(mMedias.size() - 1);
-
-        if (mMedias.size() <= 0) {
-            seekBar.setVisibility(View.GONE);
-        }
-    }
-
-    public void updateSeekBars(int position) {
-        for (SeekBar seekBar : mSeekBars) {
-            seekBar.setProgress(position);
-        }
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-
-        for (SeekBar seekBar : mSeekBars) {
-            seekBar.setMax(mMedias.size() - 1);
-
-            if (mMedias.size() <= 0) {
-                seekBar.setVisibility(View.GONE);
-            }
-        }
     }
 
     @Override
