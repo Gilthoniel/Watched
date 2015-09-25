@@ -2,6 +2,7 @@ package ch.watched.android.adapters;
 
 import android.content.Intent;
 import android.support.v4.view.PagerAdapter;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import ch.watched.android.constants.Constants;
 import ch.watched.android.models.Media;
 import ch.watched.android.service.ImageLoader;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -21,10 +23,14 @@ import java.util.List;
 public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
     List<T> mMedias;
+    SparseArray<View> mViews;
     Class<?> mClass;
 
     public PagerCardAdapter(List<T> medias, Class<?> activity) {
+        super();
+
         mMedias = medias;
+        mViews = new SparseArray<>();
         mClass = activity;
     }
 
@@ -33,6 +39,35 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
         mMedias.addAll(medias);
 
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        Iterator<T> it = mMedias.iterator();
+        int removalIndex = -1;
+        for (int i = 0; i < mViews.size() && removalIndex < 0; i++) {
+            final View view = mViews.get(i);
+            if (it.hasNext()) {
+                final Media media = it.next();
+                if (view.getTag() != media) {
+                    populateView(view, media, i);
+                }
+            } else {
+                removalIndex = i;
+            }
+        }
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+
+        if (mMedias.contains(((View) object).getTag())) {
+            return POSITION_UNCHANGED;
+        } else {
+            return POSITION_NONE;
+        }
     }
 
     @Override
@@ -50,7 +85,24 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
     public Object instantiateItem(final ViewGroup container, final int position) {
         final Media media = mMedias.get(position);
 
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.item_card_media, container, false);
+        final View view = LayoutInflater.from(container.getContext()).inflate(R.layout.item_card_media, container, false);
+        mViews.put(position, view);
+        populateView(view, media, position);
+
+        container.addView(view);
+
+        return view;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        container.removeView((View) object);
+    }
+
+    private void populateView(View view, final Media media, final int position) {
+        // Set tag for testing if the view is already filled with the good information
+        view.setTag(media);
+
         ((TextView) view.findViewById(R.id.media_title)).setText(media.getTitle());
         ((TextView) view.findViewById(R.id.media_overview)).setText(media.getOverview());
         final TextView textNext = (TextView) view.findViewById(R.id.next_episode);
@@ -61,7 +113,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
         view.findViewById(R.id.button_next).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View button) {
                 if (media.next()) {
                     mMedias.remove(position);
                     notifyDataSetChanged();
@@ -84,25 +136,14 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
                 }
             }
         });
-
-        view.setTag(media);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(container.getContext(), mClass);
+                Intent intent = new Intent(view.getContext(), mClass);
                 intent.putExtra(Constants.KEY_MEDIA_ID, media.getID());
 
-                container.getContext().startActivity(intent);
+                view.getContext().startActivity(intent);
             }
         });
-
-        container.addView(view);
-
-        return view;
-    }
-
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
     }
 }

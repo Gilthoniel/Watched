@@ -92,7 +92,7 @@ public class Episode extends Media implements Serializable {
     public void setWatched(boolean watched) {
         this.watched = watched;
 
-        DatabaseService.getInstance().update(this);
+        DatabaseService.getInstance().insert(this);
     }
 
     @Override

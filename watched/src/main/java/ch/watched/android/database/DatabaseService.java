@@ -228,22 +228,6 @@ public class DatabaseService {
         return insertMedia(episode);
     }
 
-    public int update(Media media, boolean updateWatched) {
-        try (SQLiteDatabase db = helper.getWritableDatabase()) {
-
-            ContentValues values = media.getSQLValues();
-            if (!updateWatched) {
-                values.remove(WatcherDbHelper.COLUMN_WATCHED);
-            }
-
-            return db.update(media.getSQLTable(), media.getSQLValues(), "id=" + media.getID(), null);
-        }
-    }
-
-    public int update(Media media) {
-        return update(media, true);
-    }
-
     public int remove(Media media) {
 
         try (SQLiteDatabase db = helper.getWritableDatabase()) {
@@ -260,12 +244,28 @@ public class DatabaseService {
     private long insertMedia(Media media) {
 
         if (contains(media)) {
-            return update(media);
+            return update(media, false);
         } else {
 
             try (SQLiteDatabase db = helper.getWritableDatabase()) {
                 return db.insert(media.getSQLTable(), null, media.getSQLValues());
             }
         }
+    }
+
+    private int update(Media media, boolean updateWatched) {
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+
+            ContentValues values = media.getSQLValues();
+            if (!updateWatched) {
+                values.remove(WatcherDbHelper.COLUMN_WATCHED);
+            }
+
+            return db.update(media.getSQLTable(), values, "id=" + media.getID(), null);
+        }
+    }
+
+    private int update(Media media) {
+        return update(media, true);
     }
 }

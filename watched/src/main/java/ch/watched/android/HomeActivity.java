@@ -68,8 +68,6 @@ public class HomeActivity extends AppCompatActivity {
                 0
         );
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        mDrawerList.performItemClick(null, mCurrentIndex + 1, 0);
     }
 
     @Override
@@ -77,6 +75,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
+
+        mDrawerList.performItemClick(null, mCurrentIndex + 1, 0);
     }
 
     @Override
@@ -148,7 +148,6 @@ public class HomeActivity extends AppCompatActivity {
                     .replace(R.id.content_frame, mAdapter.getItem(mCurrentIndex))
                     .commit();
 
-            mDrawerList.setItemChecked(i, true);
             setTitle(mAdapter.getItem(mCurrentIndex).getTitle());
             mDrawerLayout.closeDrawer(mDrawerList);
         }

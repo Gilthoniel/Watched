@@ -93,7 +93,7 @@ public class Movie extends Media implements Serializable {
 
     public void setWatched(boolean value) {
         isWatched = value;
-        DatabaseService.getInstance().update(this);
+        DatabaseService.getInstance().insert(this);
     }
 
     public List<Backdrop> getBackdrops() {
