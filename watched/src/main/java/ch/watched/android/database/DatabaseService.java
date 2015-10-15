@@ -1,5 +1,6 @@
 package ch.watched.android.database;
 
+import android.app.backup.BackupManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,7 +9,10 @@ import ch.watched.android.adapters.MovieExpandableAdapter;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
 import ch.watched.android.database.MovieContract.MovieEntry;
 import ch.watched.android.database.TVContract.TVEntry;
-import ch.watched.android.models.*;
+import ch.watched.android.models.Episode;
+import ch.watched.android.models.Media;
+import ch.watched.android.models.Movie;
+import ch.watched.android.models.TV;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,22 +28,38 @@ public class DatabaseService {
     private static DatabaseService instance = new DatabaseService();
 
     private WatcherDbHelper helper;
+    private BackupManager backup;
+    private final Object mLock = new Object();
 
     public static DatabaseService getInstance() {
         return instance;
     }
 
     public void initHelper(Context context) {
-        helper = new WatcherDbHelper(context);
+        if (helper == null) {
+            helper = new WatcherDbHelper(context);
+        }
+        backup = new BackupManager(context);
+    }
+
+    public void close() {
+        helper.close();
+        helper = null;
+    }
+
+    public Object getLock() {
+        return mLock;
     }
 
     public boolean contains(Media media) {
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            String query = "SELECT id FROM " + media.getSQLTable() + " WHERE id=" + media.getID();
+                String query = "SELECT id FROM " + media.getSQLTable() + " WHERE id=" + media.getID();
 
-            try (Cursor cursor = db.rawQuery(query, null)) {
-                return cursor.getCount() > 0;
+                try (Cursor cursor = db.rawQuery(query, null)) {
+                    return cursor.getCount() > 0;
+                }
             }
         }
     }
@@ -47,19 +67,21 @@ public class DatabaseService {
     public List<Movie> getUnwatchMovies() {
         List<Movie> movies = new LinkedList<>();
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME +
-                    " WHERE " + WatcherDbHelper.COLUMN_WATCHED + "=0" +
-                    " ORDER BY " + MovieEntry.COLUMN_TITLE + " ASC", null);
+                Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME +
+                        " WHERE " + WatcherDbHelper.COLUMN_WATCHED + "=0" +
+                        " ORDER BY " + MovieEntry.COLUMN_TITLE + " ASC", null);
 
-            while (cursor.getCount() > 0 && !cursor.isLast()) {
-                cursor.moveToNext();
+                while (cursor.getCount() > 0 && !cursor.isLast()) {
+                    cursor.moveToNext();
 
-                movies.add(new Movie(cursor));
+                    movies.add(new Movie(cursor));
+                }
+
+                cursor.close();
             }
-
-            cursor.close();
         }
 
         return movies;
@@ -68,17 +90,19 @@ public class DatabaseService {
     public List<Movie> getMovies(MovieExpandableAdapter adapter) {
         List<Movie> movies = new LinkedList<>();
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME +
-                    " ORDER BY " + MovieEntry.COLUMN_TITLE + " ASC", null);
-            while (cursor.getCount() > 0 && !cursor.isLast()) {
-                cursor.moveToNext();
+                Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME +
+                        " ORDER BY " + MovieEntry.COLUMN_TITLE + " ASC", null);
+                while (cursor.getCount() > 0 && !cursor.isLast()) {
+                    cursor.moveToNext();
 
-                adapter.addMovie(new Movie(cursor));
+                    adapter.addMovie(new Movie(cursor));
+                }
+
+                cursor.close();
             }
-
-            cursor.close();
         }
 
         return movies;
@@ -87,20 +111,22 @@ public class DatabaseService {
     public List<TV> getUnwatchedTVs() {
         List<TV> series = new LinkedList<>();
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            Cursor cursor = db.rawQuery("SELECT * FROM " + TVContract.TVEntry.TABLE_NAME + " WHERE id IN (" +
-                    "SELECT DISTINCT tv_id FROM " + EpisodeEntry.TABLE_NAME + " WHERE " + WatcherDbHelper.COLUMN_WATCHED +
-                    "=0) ORDER BY " + TVEntry.COLUMN_NAME + " ASC"
-            , null);
+                Cursor cursor = db.rawQuery("SELECT * FROM " + TVContract.TVEntry.TABLE_NAME + " WHERE id IN (" +
+                        "SELECT DISTINCT tv_id FROM " + EpisodeEntry.TABLE_NAME + " WHERE " + WatcherDbHelper.COLUMN_WATCHED +
+                        "=0) ORDER BY " + TVEntry.COLUMN_NAME + " ASC"
+                        , null);
 
-            while (cursor.getCount() > 0 && !cursor.isLast()) {
-                cursor.moveToNext();
+                while (cursor.getCount() > 0 && !cursor.isLast()) {
+                    cursor.moveToNext();
 
-                series.add(new TV(cursor));
+                    series.add(new TV(cursor));
+                }
+
+                cursor.close();
             }
-
-            cursor.close();
         }
 
         return series;
@@ -109,18 +135,20 @@ public class DatabaseService {
     public List<TV> getTVs() {
         List<TV> series = new LinkedList<>();
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            Cursor cursor = db.rawQuery("SELECT * FROM " + TVEntry.TABLE_NAME +
-                    " ORDER BY " + TVEntry.COLUMN_NAME + " ASC", null);
+                Cursor cursor = db.rawQuery("SELECT * FROM " + TVEntry.TABLE_NAME +
+                        " ORDER BY " + TVEntry.COLUMN_NAME + " ASC", null);
 
-            while (cursor.getCount() > 0 && !cursor.isLast()) {
-                cursor.moveToNext();
+                while (cursor.getCount() > 0 && !cursor.isLast()) {
+                    cursor.moveToNext();
 
-                series.add(new TV(cursor));
+                    series.add(new TV(cursor));
+                }
+
+                cursor.close();
             }
-
-            cursor.close();
         }
 
         return series;
@@ -128,14 +156,16 @@ public class DatabaseService {
 
     public Movie getMovie(long id) {
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            try (Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME + " WHERE id=" + id, null)) {
+                try (Cursor cursor = db.rawQuery("SELECT * FROM " + MovieEntry.TABLE_NAME + " WHERE id=" + id, null)) {
 
-                if (cursor.getCount() > 0) {
-                    cursor.moveToNext();
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToNext();
 
-                    return new Movie(cursor);
+                        return new Movie(cursor);
+                    }
                 }
             }
         }
@@ -145,14 +175,16 @@ public class DatabaseService {
 
     public TV getTV(long id) {
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            try (Cursor cursor = db.rawQuery("SELECT * FROM " + TVEntry.TABLE_NAME + " WHERE id="+id, null)) {
+                try (Cursor cursor = db.rawQuery("SELECT * FROM " + TVEntry.TABLE_NAME + " WHERE id=" + id, null)) {
 
-                if (cursor.getCount() > 0) {
-                    cursor.moveToNext();
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToNext();
 
-                    return new TV(cursor);
+                        return new TV(cursor);
+                    }
                 }
             }
         }
@@ -164,25 +196,27 @@ public class DatabaseService {
 
         Map<Integer, List<Episode>> episodes = new HashMap<>();
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            String selection = "SELECT * FROM " + EpisodeEntry.TABLE_NAME +
-                    " WHERE " + EpisodeEntry.COLUMN_TV_ID + "=" +tvID +
-                    " ORDER BY " + EpisodeEntry.COLUMN_SEASON_NB + " ASC, " +
-                    EpisodeEntry.COLUMN_EPISODE_NB + " ASC";
+                String selection = "SELECT * FROM " + EpisodeEntry.TABLE_NAME +
+                        " WHERE " + EpisodeEntry.COLUMN_TV_ID + "=" + tvID +
+                        " ORDER BY " + EpisodeEntry.COLUMN_SEASON_NB + " ASC, " +
+                        EpisodeEntry.COLUMN_EPISODE_NB + " ASC";
 
-            try (Cursor cursor = db.rawQuery(selection, null)) {
+                try (Cursor cursor = db.rawQuery(selection, null)) {
 
-                while (cursor.getCount() > 0 && !cursor.isLast()) {
-                    cursor.moveToNext();
+                    while (cursor.getCount() > 0 && !cursor.isLast()) {
+                        cursor.moveToNext();
 
-                    Episode episode = new Episode(cursor);
+                        Episode episode = new Episode(cursor);
 
-                    if (!episodes.containsKey(episode.getSeasonNumber())) {
-                        episodes.put(episode.getSeasonNumber(), new LinkedList<Episode>());
+                        if (!episodes.containsKey(episode.getSeasonNumber())) {
+                            episodes.put(episode.getSeasonNumber(), new LinkedList<Episode>());
+                        }
+
+                        episodes.get(episode.getSeasonNumber()).add(episode);
                     }
-
-                    episodes.get(episode.getSeasonNumber()).add(episode);
                 }
             }
         }
@@ -192,22 +226,24 @@ public class DatabaseService {
 
     public Episode getUnwatchedEpisode(long tvID) {
 
-        try (SQLiteDatabase db = helper.getReadableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
-            String selection = "SELECT * FROM " + EpisodeEntry.TABLE_NAME +
-                    " WHERE " + EpisodeEntry.COLUMN_TV_ID + "=" + tvID +
-                    " AND " + WatcherDbHelper.COLUMN_WATCHED + "=0" +
-                    " ORDER BY " + EpisodeEntry.COLUMN_SEASON_NB + " ASC, " +
-                    EpisodeEntry.COLUMN_EPISODE_NB + " ASC LIMIT 1";
+                String selection = "SELECT * FROM " + EpisodeEntry.TABLE_NAME +
+                        " WHERE " + EpisodeEntry.COLUMN_TV_ID + "=" + tvID +
+                        " AND " + WatcherDbHelper.COLUMN_WATCHED + "=0" +
+                        " ORDER BY " + EpisodeEntry.COLUMN_SEASON_NB + " ASC, " +
+                        EpisodeEntry.COLUMN_EPISODE_NB + " ASC LIMIT 1";
 
-            try (Cursor cursor = db.rawQuery(selection, null)) {
+                try (Cursor cursor = db.rawQuery(selection, null)) {
 
-                if (cursor.getCount() > 0) {
-                    cursor.moveToNext();
-                    return new Episode(cursor);
-                } else {
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToNext();
+                        return new Episode(cursor);
+                    } else {
 
-                    return null;
+                        return null;
+                    }
                 }
             }
         }
@@ -230,14 +266,18 @@ public class DatabaseService {
 
     public int remove(Media media) {
 
-        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getWritableDatabase()) {
 
-            if (media.getSQLTable().equals(TVContract.TVEntry.TABLE_NAME)) {
+                if (media.getSQLTable().equals(TVContract.TVEntry.TABLE_NAME)) {
 
-                db.delete(EpisodeEntry.TABLE_NAME, EpisodeEntry.COLUMN_TV_ID + "=" + media.getID(), null);
+                    db.delete(EpisodeEntry.TABLE_NAME, EpisodeEntry.COLUMN_TV_ID + "=" + media.getID(), null);
+                }
+
+                backup.dataChanged();
+
+                return db.delete(media.getSQLTable(), "id=" + media.getID(), null);
             }
-
-            return db.delete(media.getSQLTable(), "id=" + media.getID(), null);
         }
     }
 
@@ -251,21 +291,30 @@ public class DatabaseService {
             return update(media, false);
         } else {
 
-            try (SQLiteDatabase db = helper.getWritableDatabase()) {
-                return db.insert(media.getSQLTable(), null, media.getSQLValues());
+            synchronized (mLock) {
+                try (SQLiteDatabase db = helper.getWritableDatabase()) {
+                    return db.insert(media.getSQLTable(), null, media.getSQLValues());
+                } finally {
+                    backup.dataChanged();
+                }
             }
         }
     }
 
     private int update(Media media, boolean updateWatched) {
-        try (SQLiteDatabase db = helper.getWritableDatabase()) {
 
-            ContentValues values = media.getSQLValues();
-            if (!updateWatched) {
-                values.remove(WatcherDbHelper.COLUMN_WATCHED);
+        synchronized (mLock) {
+            try (SQLiteDatabase db = helper.getWritableDatabase()) {
+
+                ContentValues values = media.getSQLValues();
+                if (!updateWatched) {
+                    values.remove(WatcherDbHelper.COLUMN_WATCHED);
+                }
+
+                return db.update(media.getSQLTable(), values, "id=" + media.getID(), null);
+            } finally {
+                backup.dataChanged();
             }
-
-            return db.update(media.getSQLTable(), values, "id=" + media.getID(), null);
         }
     }
 }

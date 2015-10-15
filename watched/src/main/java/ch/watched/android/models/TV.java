@@ -104,7 +104,7 @@ public class TV extends Media implements Serializable {
             episode.setWatched(true);
         }
 
-        return DatabaseService.getInstance().getEpisodes(id) == null;
+        return DatabaseService.getInstance().getUnwatchedEpisode(id) == null;
     }
 
     @Override
