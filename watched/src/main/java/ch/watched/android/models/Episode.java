@@ -17,6 +17,17 @@ public class Episode extends Media implements Serializable {
 
     private static final long serialVersionUID = -8663364071143389959L;
 
+    private long id;
+    private String air_date;
+    private int episode_number;
+    private String name;
+    private String overview;
+    private int season_number;
+    private String still_path;
+    private float vote_average;
+    private long tv_id;
+    private boolean watched;
+
     public Episode(Cursor cursor) {
         id = cursor.getInt(1);
         air_date = cursor.getString(2);
@@ -29,17 +40,6 @@ public class Episode extends Media implements Serializable {
         tv_id = cursor.getInt(9);
         watched = cursor.getInt(10) == 1;
     }
-
-    private long id;
-    private String air_date;
-    private int episode_number;
-    private String name;
-    private String overview;
-    private int season_number;
-    private String still_path;
-    private float vote_average;
-    private long tv_id;
-    private boolean watched;
 
     public long getID() {
         return id;
@@ -92,7 +92,7 @@ public class Episode extends Media implements Serializable {
     public void setWatched(boolean watched) {
         this.watched = watched;
 
-        DatabaseService.getInstance().insert(this);
+        DatabaseService.getInstance().update(this);
     }
 
     @Override

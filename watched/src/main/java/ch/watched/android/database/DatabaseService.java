@@ -241,6 +241,10 @@ public class DatabaseService {
         }
     }
 
+    public int update(Media media) {
+        return update(media, true);
+    }
+
     private long insertMedia(Media media) {
 
         if (contains(media)) {
@@ -263,9 +267,5 @@ public class DatabaseService {
 
             return db.update(media.getSQLTable(), values, "id=" + media.getID(), null);
         }
-    }
-
-    private int update(Media media) {
-        return update(media, true);
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import ch.watched.android.models.MovieDBConfiguration;
 import ch.watched.android.service.utils.RequestCallback;
@@ -24,7 +25,7 @@ public class ImageLoader {
 
     private static final int MAXIMUM_IMAGES_STACK = 20;
 
-    public enum ImageType { POSTER, BACKDROP }
+    public enum ImageType { POSTER, BACKDROP, STILL }
 
     public static ImageLoader instance = new ImageLoader();
 
@@ -75,6 +76,8 @@ public class ImageLoader {
         // Looking for the bitmap in the memory cache
         if (mImages.containsKey(url)) {
             image.setImageBitmap(mImages.get(url));
+            image.setVisibility(View.VISIBLE);
+            image.invalidate();
             return;
         }
 
@@ -134,6 +137,9 @@ public class ImageLoader {
                 case BACKDROP:
                     builder.appendEncodedPath(mConfig.getBackdropSize());
                     break;
+                case STILL:
+                    builder.appendEncodedPath(mConfig.getStillSize());
+                    break;
             }
 
             // image url
@@ -175,6 +181,7 @@ public class ImageLoader {
                 if (mViews.containsKey(mUrl)) {
                     for (ImageView view : mViews.get(mUrl)) {
                         view.setImageBitmap(bitmap);
+                        view.setVisibility(View.VISIBLE);
                         view.invalidate();
                     }
                 }

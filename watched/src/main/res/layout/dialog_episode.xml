@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/media_image" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"
+            android:scaleType="centerCrop" android:visibility="gone"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Episode title"
+            android:id="@+id/media_title" android:layout_below="@+id/media_image"
+            android:layout_alignParentRight="true" android:padding="5dp"
+            android:layout_alignParentEnd="true" android:layout_toEndOf="@+id/media_season"
+            android:background="@color/ColorPrimary"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="000"
+            android:id="@+id/media_season" android:layout_below="@+id/media_image" android:layout_alignParentStart="true"
+            android:padding="5dp" android:background="@color/ColorPrimaryDark"/>
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollView"
+            android:layout_below="@+id/media_title" android:layout_alignEnd="@+id/media_title">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Overview..."
+                android:id="@+id/media_overview"
+                android:layout_alignParentStart="true" android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
+                android:padding="10dp" android:textSize="14sp" android:textStyle="italic"
+                android:layout_below="@+id/media_title"/>
+    </ScrollView>
+</RelativeLayout>

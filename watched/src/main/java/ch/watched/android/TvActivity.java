@@ -1,6 +1,6 @@
 package ch.watched.android;
 
-import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import ch.watched.android.adapters.EpisodeExpandableAdapter;
 import ch.watched.android.constants.Constants;
 import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
+import ch.watched.android.dialogs.EpisodeDialog;
 import ch.watched.android.models.Backdrop;
 import ch.watched.android.models.Episode;
 import ch.watched.android.models.TV;
@@ -29,7 +30,8 @@ public class TvActivity extends AppCompatActivity {
 
     private EpisodeExpandableAdapter mAdapter;
     private ExpandableListView mEpisodes;
-    private Dialog mDialog;
+    private ProgressDialog mDialog;
+    private EpisodeDialog mEpisodeDialog = new EpisodeDialog();
     private long mID;
     private TV mTV;
 
@@ -70,6 +72,16 @@ public class TvActivity extends AppCompatActivity {
 
         // Episodes
         mEpisodes = (ExpandableListView) findViewById(R.id.list_episodes);
+        mEpisodes.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int group, int child, long l) {
+
+                mEpisodeDialog.setEpisode(mAdapter.getChild(group, child));
+                mEpisodeDialog.show(getSupportFragmentManager(), "episode_dialog");
+
+                return true;
+            }
+        });
         mEpisodes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -101,6 +113,7 @@ public class TvActivity extends AppCompatActivity {
         }
 
         mDialog = Utils.createProgressDialog(TvActivity.this);
+        mDialog.setMessage("Episodes are marking as watched");
     }
 
     @Override

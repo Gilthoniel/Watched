@@ -24,8 +24,11 @@ public class MovieDBConfiguration implements Serializable {
     }
 
     public String getBackdropSize() {
-
         return images.backdrop_sizes.get(1);
+    }
+
+    public String getStillSize() {
+        return images.still_sizes.get(images.still_sizes.size() - 2);
     }
 
     private class ImageConf implements Serializable {
@@ -36,6 +39,7 @@ public class MovieDBConfiguration implements Serializable {
         private String secured_base_url;
         private List<String> poster_sizes;
         private List<String> backdrop_sizes;
+        private List<String> still_sizes;
 
         public String getBaseUrl() {
             return base_url;

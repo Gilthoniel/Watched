@@ -71,7 +71,7 @@ public class Utils {
         return builder.toString();
     }
 
-    public static Dialog createProgressDialog(Context context) {
+    public static ProgressDialog createProgressDialog(Context context) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setIndeterminate(true);
         dialog.setTitle("Please wait...");
