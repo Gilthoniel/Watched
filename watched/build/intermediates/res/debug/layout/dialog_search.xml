@@ -53,4 +53,4 @@
         android:layout_alignStart="@+id/textView3"
         style="?android:ratingBarStyleSmall"
         android:rating="2.5"/>
-</RelativeLayout><!-- From: file:/F:/Developpement/Grim/Watched/watched/src/main/res/layout/dialog_search.xml -->
+</RelativeLayout><!-- From: file:/C:/Development/grim/Watched/watched/src/main/res/layout/dialog_search.xml -->
