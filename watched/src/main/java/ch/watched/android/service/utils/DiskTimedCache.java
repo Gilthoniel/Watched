@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -21,17 +22,12 @@ public class DiskTimedCache {
     private Map<String, CacheFile> mFiles;
     private File mDirectory;
     private long mMaxSize;
-    private int mVersion;
 
     private DiskTimedCache() {
 
         // Stack to manage the LRU policy
         mStack = new LinkedList<>();
         mFiles = new HashMap<>();
-    }
-
-    public void setStack(LinkedList<String> stack) {
-        mStack = stack;
     }
 
     /**
@@ -239,12 +235,6 @@ public class DiskTimedCache {
             cache.mDirectory = file;
             cache.mMaxSize = maxSize;
 
-            if (version > 0) {
-                cache.mVersion = version;
-            } else {
-                cache.mVersion = -1 * version;
-            }
-
             // Create the directory if it doesn't exist
             if (cache.mDirectory.mkdirs()) {
                 Log.d("__CACHE__", "Cache directory created");
@@ -300,14 +290,17 @@ public class DiskTimedCache {
 
     private void cleanDirectory() {
 
-        for (Map.Entry<String,CacheFile> entry : mFiles.entrySet()) {
-            if (entry.getValue().isExpired()) {
-                if (!entry.getValue().delete()) {
+        Iterator<String> it = mFiles.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            CacheFile file = mFiles.get(key);
+            if (file.isExpired()) {
+                if (!file.delete()) {
                     Log.e("__CACHE__", "Can't remove a file");
                 }
 
-                mStack.remove(entry.getKey());
-                mFiles.remove(entry.getKey());
+                mStack.remove(key);
+                it.remove();
             }
         }
 
