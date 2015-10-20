@@ -13,6 +13,7 @@ public abstract class Media {
     public abstract String getTitle();
     public abstract float getRating();
     public abstract String getOverview();
+    public abstract String getDate();
 
     public String getNextMedia() {
         return "";

@@ -7,10 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by Gaylor on 02.07.2015.
  * Helper to instantiate a database
+ * @version 9 : Add date to TV table
  */
 public class WatcherDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "Watcher.db";
 
     public static final String COLUMN_ID = "id";
@@ -29,10 +30,15 @@ public class WatcherDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(MovieContract.MovieEntry.SQL_DELETE);
-        db.execSQL(TVContract.TVEntry.SQL_DELETE);
-        db.execSQL(EpisodeContract.EpisodeEntry.SQL_DELETE);
-        onCreate(db);
+
+        if (oldVersion <= 8) {
+            // Column for the first air date
+            db.execSQL("ALTER TABLE " + TVContract.TVEntry.TABLE_NAME + " ADD COLUMN " +
+                    TVContract.TVEntry.COLUMN_FIRST_DATE + " TEXT");
+            // Column for the last air date
+            db.execSQL("ALTER TABLE " + TVContract.TVEntry.TABLE_NAME + " ADD COLUMN " +
+                    TVContract.TVEntry.COLUMN_END_DATE + " TEXT");
+        }
     }
 
     @Override

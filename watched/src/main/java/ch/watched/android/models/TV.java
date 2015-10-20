@@ -36,6 +36,8 @@ public class TV extends Media implements Serializable {
     private List<Season> seasons;
     private List<Genre> genres;
     private ImagesWrapper images;
+    private String first_air_date;
+    private String last_air_date;
 
     public TV(Cursor cursor) {
         id = cursor.getInt(1);
@@ -54,6 +56,8 @@ public class TV extends Media implements Serializable {
         images = new ImagesWrapper();
         images.backdrops = Utils.getObject(cursor.getBlob(14), new TypeToken<List<Backdrop>>(){}.getType());
         genres = Utils.getObject(cursor.getBlob(15), new TypeToken<List<Genre>>(){}.getType());
+        first_air_date = cursor.getString(16);
+        last_air_date = cursor.getString(17);
     }
 
     @Override
@@ -79,6 +83,11 @@ public class TV extends Media implements Serializable {
     @Override
     public String getOverview() {
         return overview;
+    }
+
+    @Override
+    public String getDate() {
+        return first_air_date;
     }
 
     public List<Season> getSeasons() {
@@ -125,6 +134,8 @@ public class TV extends Media implements Serializable {
         values.put(TVContract.TVEntry.COLUMN_TYPE, type);
         values.put(TVContract.TVEntry.COLUMN_BACKDROPS, Utils.getBytes(images.backdrops));
         values.put(TVContract.TVEntry.COLUMN_GENRES, Utils.getBytes(genres));
+        values.put(TVContract.TVEntry.COLUMN_FIRST_DATE, first_air_date);
+        values.put(TVContract.TVEntry.COLUMN_END_DATE, last_air_date);
 
         return values;
     }

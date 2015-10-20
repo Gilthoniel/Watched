@@ -11,4 +11,5 @@
     <string name="title_activity_movie">MovieActivity</string>
 
     <string name="report_bug">Bug report sent to the developer! Sorry for that :(</string>
+    <string name="image_description">Poster</string>
 </resources>

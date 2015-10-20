@@ -53,6 +53,7 @@ public class TvActivity extends AppCompatActivity {
         setTitle("");
 
         ((TextView) findViewById(R.id.media_title)).setText(mTV.getTitle());
+        ((TextView) findViewById(R.id.media_date)).setText(mTV.getDate());
 
         // Backdrops animation
         ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);

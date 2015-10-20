@@ -26,6 +26,8 @@ public class TVContract {
         public static final String COLUMN_SCORE = "score";
         public static final String COLUMN_BACKDROPS = "backdrops";
         public static final String COLUMN_GENRES = "genres";
+        public static final String COLUMN_FIRST_DATE = "release_date";
+        public static final String COLUMN_END_DATE = "end_date";
 
         public static final String SQL_CREATE = "create table "+TABLE_NAME+" (" +
                 _ID + " INTEGER PRIMARY KEY," +
@@ -43,7 +45,9 @@ public class TVContract {
                 COLUMN_TYPE + " TEXT," +
                 COLUMN_SCORE + " NUMBER," +
                 COLUMN_BACKDROPS + " BLOB," +
-                COLUMN_GENRES + " BLOB" +
+                COLUMN_GENRES + " BLOB," +
+                COLUMN_FIRST_DATE + " TEXT," +
+                COLUMN_END_DATE + " TEXT" +
                 ");";
 
         public static final String SQL_DELETE = "drop table if exists " + TABLE_NAME;

@@ -20,6 +20,7 @@ import android.widget.ListView;
 import ch.watched.R;
 import ch.watched.android.adapters.NavigationAdapter;
 import ch.watched.android.constants.Constants;
+import ch.watched.android.fragments.HomeFragment;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -142,13 +143,15 @@ public class HomeActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
             mCurrentIndex = i - 1;
+            HomeFragment fragment = mAdapter.getItem(mCurrentIndex);
+            fragment.reload();
 
             FragmentManager manager = getSupportFragmentManager();
             manager.beginTransaction()
-                    .replace(R.id.content_frame, mAdapter.getItem(mCurrentIndex))
+                    .replace(R.id.content_frame, fragment)
                     .commit();
 
-            setTitle(mAdapter.getItem(mCurrentIndex).getTitle());
+            setTitle(fragment.getTitle());
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }

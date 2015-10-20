@@ -28,6 +28,10 @@ public class TVsFragment extends HomeFragment {
 
     @Override
     public void reload() {
+        if (getView() == null) {
+            return;
+        }
+
         mAdapter.putAll(DatabaseService.getInstance().getTVs());
     }
 

@@ -239,6 +239,7 @@
     <string name="action_settings">Settings</string>
     <string name="app_name">Watched</string>
     <string name="hello_world">Hello world!</string>
+    <string name="image_description">Poster</string>
     <string name="report_bug">Bug report sent to the developer! Sorry for that :(</string>
     <string name="search_button_name">Search</string>
     <string name="search_hint">Search …</string>

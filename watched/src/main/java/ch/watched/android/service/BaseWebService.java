@@ -12,6 +12,7 @@ import ch.watched.android.models.*;
 import ch.watched.android.service.utils.RequestCallback;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Created by gaylor on 08/29/2015.
@@ -202,6 +203,40 @@ public class BaseWebService extends WebService {
                 return TV.class;
             }
         });
+    }
+
+    public void discover(RequestCallback<SearchMovie.Wrapper> callback) {
+        Uri.Builder builder = getBuilder();
+        builder.appendEncodedPath("discover/movie");
+
+        get(builder, callback, null);
+    }
+
+    public void getGenres() {
+        Uri.Builder builder = getBuilder();
+        builder.appendEncodedPath("genre/movie/list");
+
+        RequestCallback<Genre.Wrapper> callback = new RequestCallback<Genre.Wrapper>() {
+            @Override
+            public void onSuccess(Genre.Wrapper result) {
+                GenreManager.instance().addAll(result.genres);
+            }
+
+            @Override
+            public void onFailure(Errors error) {
+                Log.e("--GENRES--", "Error when loading genres: "+error.name());
+            }
+
+            @Override
+            public Type getType() {
+                return Genre.Wrapper.class;
+            }
+        };
+        get(builder, callback, null);
+
+        builder = getBuilder();
+        builder.appendEncodedPath("genre/tv/list");
+        get(builder, callback, null);
     }
 
     private void insertSeason(final long id, int number) {

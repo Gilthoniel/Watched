@@ -30,6 +30,10 @@ public class ResumeFragment extends HomeFragment {
 
     @Override
     public void reload() {
+        if (getView() == null) {
+            return;
+        }
+
         mMoviesAdapter.putAll(DatabaseService.getInstance().getUnwatchMovies());
         mSeriesAdapter.putAll(DatabaseService.getInstance().getUnwatchedTVs());
     }
@@ -61,5 +65,7 @@ public class ResumeFragment extends HomeFragment {
 
         PaginationView paginationSeries = (PaginationView) getView().findViewById(R.id.pagination_series);
         paginationSeries.setViewPager(series);
+
+        reload();
     }
 }

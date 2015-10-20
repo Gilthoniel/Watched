@@ -27,14 +27,14 @@
             android:layout_height="wrap_content"
             android:text="Genres"
             android:id="@+id/media_genres" android:layout_below="@+id/flipper" android:layout_alignParentStart="true"
-            android:padding="10dp" android:layout_toStartOf="@+id/media_rating"/>
+            android:padding="5dp" android:layout_toStartOf="@+id/media_rating"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Description"
-            android:id="@+id/media_overview" android:layout_below="@+id/media_genres"
-            android:layout_alignParentStart="true" android:textSize="12sp" android:paddingLeft="10dp"
-            android:paddingRight="10dp" android:textStyle="italic"/>
+            android:id="@+id/media_overview" android:layout_below="@+id/media_date"
+            android:layout_alignParentStart="true" android:textSize="12sp"
+            android:textStyle="italic" android:padding="5dp"/>
     <RatingBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,4 +49,10 @@
             android:layout_alignBottom="@+id/flipper" android:layout_alignParentRight="true"
             android:checked="false" android:layout_alignTop="@+id/media_title"
             android:clickable="false" android:background="#c8000000" android:paddingRight="10dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:id="@+id/media_date" android:layout_below="@+id/media_genres" android:layout_alignParentEnd="true"
+            android:padding="5dp" android:layout_marginRight="10dp" android:textSize="12sp"/>
 </RelativeLayout>

@@ -27,6 +27,10 @@ public class MoviesFragment extends HomeFragment {
 
     @Override
     public void reload() {
+        if (getView() == null) {
+            return;
+        }
+
         mAdapter.clear();
 
         DatabaseService.getInstance().getMovies(mAdapter);

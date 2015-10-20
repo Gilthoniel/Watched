@@ -1,16 +1,7 @@
 package ch.watched.android.models;
 
 import android.content.ContentValues;
-import android.graphics.Bitmap;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import ch.watched.R;
-import ch.watched.android.adapters.MediaSearchAdapter;
-import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.TVContract;
-import ch.watched.android.service.BaseWebService;
 
 import java.io.Serializable;
 import java.util.List;
@@ -60,6 +51,11 @@ public class SearchTV extends Media implements Serializable {
     @Override
     public String getOverview() {
         return overview;
+    }
+
+    @Override
+    public String getDate() {
+        return first_air_date;
     }
 
     @Override

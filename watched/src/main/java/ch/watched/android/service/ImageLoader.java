@@ -81,6 +81,9 @@ public class ImageLoader {
             return;
         }
 
+        image.setImageBitmap(null);
+        image.invalidate();
+
         // Looking for a request already launched
         if (mViews.containsKey(url)) {
             mViews.get(url).add(image);

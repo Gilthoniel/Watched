@@ -1,6 +1,7 @@
 package ch.watched.android.models;
 
 import android.content.ContentValues;
+import ch.watched.android.constants.Utils;
 import ch.watched.android.database.MovieContract;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public class SearchMovie extends Media implements Serializable {
 
     private boolean adult;
     private String backdrop_path;
-    private int[] genre_ids;
+    private long[] genre_ids;
     private long id;
     private String original_language;
     private String original_title;
@@ -52,6 +53,15 @@ public class SearchMovie extends Media implements Serializable {
     @Override
     public String getOverview() {
         return overview;
+    }
+
+    @Override
+    public String getDate() {
+        return Utils.parseDate(release_date);
+    }
+
+    public long[] getGenres() {
+        return genre_ids;
     }
 
     @Override

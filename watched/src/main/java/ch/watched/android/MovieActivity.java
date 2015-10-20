@@ -50,6 +50,7 @@ public class MovieActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.media_genres)).setText(Utils.join(mMovie.getGenres()));
         ((TextView) findViewById(R.id.media_overview)).setText(mMovie.getOverview());
         ((RatingBar) findViewById(R.id.media_rating)).setRating(mMovie.getRating());
+        ((TextView) findViewById(R.id.media_date)).setText(mMovie.getDate());
         mWatchedButton = (RadioButton) findViewById(R.id.media_watched);
         checkIcon();
 

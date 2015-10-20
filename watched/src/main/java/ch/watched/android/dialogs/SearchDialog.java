@@ -45,6 +45,7 @@ public class SearchDialog extends DialogFragment {
         ((TextView) view.findViewById(R.id.media_title)).setText(mMedia.getTitle());
         ((RatingBar) view.findViewById(R.id.media_rating)).setRating(mMedia.getRating());
         ((TextView) view.findViewById(R.id.media_overview)).setText(mMedia.getOverview());
+        ((TextView) view.findViewById(R.id.media_date)).setText(mMedia.getDate());
 
         builder.setView(view);
 

@@ -1,6 +1,5 @@
 package ch.watched.android.constants;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
@@ -8,14 +7,20 @@ import ch.watched.android.service.MessageParser;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Created by gaylor on 09/20/2015.
  * General useful functions
  */
 public class Utils {
+
+    private static final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-mm-dd", Locale.US);
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy", Locale.getAvailableLocales()[0]);
 
     public static byte[] getBytes(Object object) {
 
@@ -79,5 +84,13 @@ public class Utils {
         dialog.setCancelable(false);
 
         return dialog;
+    }
+
+    public static String parseDate(String date) {
+        try {
+            return dateFormatter.format(dateParser.parse(date));
+        } catch (ParseException e) {
+            return "";
+        }
     }
 }

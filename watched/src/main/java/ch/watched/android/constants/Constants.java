@@ -1,5 +1,6 @@
 package ch.watched.android.constants;
 
+import ch.watched.android.fragments.DiscoverFragment;
 import ch.watched.android.fragments.MoviesFragment;
 import ch.watched.android.fragments.ResumeFragment;
 import ch.watched.android.fragments.TVsFragment;
@@ -16,6 +17,7 @@ public class Constants {
 
     public static Class<?>[] HOME_FRAGMENTS = new Class<?>[] {
             ResumeFragment.class,
+            DiscoverFragment.class,
             MoviesFragment.class,
             TVsFragment.class
     };

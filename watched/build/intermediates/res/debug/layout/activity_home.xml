@@ -27,10 +27,10 @@
               android:layout_height="match_parent"
               android:layout_gravity="start"
               android:choiceMode="singleChoice"
-              android:dividerHeight="1dp"
+              android:dividerHeight="0dp"
               android:background="#ff212121"
               android:headerDividersEnabled="true"
-              android:divider="#ff0f0f0f"
+              android:divider="#00000000"
               android:listSelector="@color/ColorPrimaryDark"/>
 
 </android.support.v4.widget.DrawerLayout>

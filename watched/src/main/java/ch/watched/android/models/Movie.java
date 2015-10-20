@@ -83,8 +83,9 @@ public class Movie extends Media implements Serializable {
         return overview;
     }
 
+    @Override
     public String getDate() {
-        return release_date;
+        return Utils.parseDate(release_date);
     }
 
     public boolean isWatched() {
