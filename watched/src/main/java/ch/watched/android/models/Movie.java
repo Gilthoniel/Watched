@@ -132,6 +132,12 @@ public class Movie extends Media implements Serializable {
         return MovieEntry.TABLE_NAME;
     }
 
+    @Override
+    public void insertIntoDatabase(Runnable runnable) {
+        DatabaseService.getInstance().insert(this);
+        runnable.run();
+    }
+
     private class ImagesWrapper implements Serializable {
         private static final long serialVersionUID = 2399617677302005418L;
 

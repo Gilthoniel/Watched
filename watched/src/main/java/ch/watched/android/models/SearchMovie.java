@@ -2,9 +2,13 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import ch.watched.android.constants.Utils;
+import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.MovieContract;
+import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.utils.RequestCallback;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -73,6 +77,24 @@ public class SearchMovie extends Media implements Serializable {
     public ContentValues getSQLValues() {
 
         throw new UnsupportedOperationException("A search media doesn't fit in the database");
+    }
+
+    @Override
+    public void insertIntoDatabase(final Runnable runnable) {
+        BaseWebService.instance.getMovie(id, new RequestCallback<Movie>() {
+            @Override
+            public void onSuccess(Movie movie) {
+                movie.insertIntoDatabase(runnable);
+            }
+
+            @Override
+            public void onFailure(Errors error) {}
+
+            @Override
+            public Type getType() {
+                return Movie.class;
+            }
+        });
     }
 
     public class Wrapper implements Serializable {

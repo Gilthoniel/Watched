@@ -1,9 +1,13 @@
 package ch.watched.android.models;
 
 import android.content.ContentValues;
+import android.util.Log;
 import ch.watched.android.database.TVContract;
+import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.utils.RequestCallback;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -67,6 +71,26 @@ public class SearchTV extends Media implements Serializable {
     @Override
     public ContentValues getSQLValues() {
         throw new UnsupportedOperationException("A search media doesn't fit in the database");
+    }
+
+    @Override
+    public void insertIntoDatabase(final Runnable runnable) {
+        BaseWebService.instance.getTV(id, new RequestCallback<TV>() {
+            @Override
+            public void onSuccess(TV result) {
+                result.insertIntoDatabase(runnable);
+            }
+
+            @Override
+            public void onFailure(Errors error) {
+                Log.e("--INTERNET--", "Internet error: " + error.name());
+            }
+
+            @Override
+            public Type getType() {
+                return SearchTV.class;
+            }
+        });
     }
 
     public class Wrapper implements Serializable {

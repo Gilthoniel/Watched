@@ -145,6 +145,12 @@ public class TV extends Media implements Serializable {
         return TVContract.TVEntry.TABLE_NAME;
     }
 
+    @Override
+    public void insertIntoDatabase(Runnable runnable) {
+        DatabaseService.getInstance().insert(this);
+        runnable.run();
+    }
+
     public class Season implements Serializable {
 
         private static final long serialVersionUID = -968718735486066593L;

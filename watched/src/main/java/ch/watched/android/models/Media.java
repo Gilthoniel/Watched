@@ -30,4 +30,6 @@ public abstract class Media {
     public abstract String getSQLTable();
 
     public abstract ContentValues getSQLValues();
+
+    public abstract void insertIntoDatabase(Runnable runnable);
 }

@@ -19,7 +19,7 @@ import java.util.Locale;
  */
 public class Utils {
 
-    private static final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-mm-dd", Locale.US);
+    private static final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy", Locale.getAvailableLocales()[0]);
 
     public static byte[] getBytes(Object object) {

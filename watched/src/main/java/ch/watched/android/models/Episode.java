@@ -118,6 +118,12 @@ public class Episode extends Media implements Serializable {
     }
 
     @Override
+    public void insertIntoDatabase(Runnable runnable) {
+        DatabaseService.getInstance().insert(this);
+        runnable.run();
+    }
+
+    @Override
     public String toString() {
         return "Episode["+id+", "+episode_number+", "+season_number+", "+name+"]";
     }

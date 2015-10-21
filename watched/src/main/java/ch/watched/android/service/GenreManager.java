@@ -14,11 +14,11 @@ public class GenreManager {
     private static final GenreManager instance = new GenreManager();
 
     private Map<Long, String> mGenres;
-    private List<Tuple> mQueue;
+    private Set<Tuple> mQueue;
 
     private GenreManager() {
         mGenres = new HashMap<>();
-        mQueue = new LinkedList<>();
+        mQueue = new HashSet<>();
     }
 
     public static GenreManager instance() {
@@ -58,8 +58,10 @@ public class GenreManager {
 
                 builder.append(mGenres.get(id));
             } else if (firstTry) {
+                if (mQueue.size() == 0) {
+                    BaseWebService.instance.getGenres();
+                }
                 mQueue.add(new Tuple(view, ids));
-                BaseWebService.instance.getGenres();
                 return;
             }
         }
@@ -79,6 +81,22 @@ public class GenreManager {
         public Tuple(TextView view, long[] ids) {
             this.view = view;
             this.ids = ids;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != Tuple.class) {
+                return false;
+            } else {
+
+                Tuple other = (Tuple) o;
+                return view == other.view && ids == other.ids;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return view.hashCode();
         }
     }
 }

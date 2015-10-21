@@ -264,7 +264,7 @@ public class BaseWebService extends WebService {
         });
     }
 
-    private void getMovie(final long id, RequestCallback<Movie> callback) {
+    public void getMovie(final long id, RequestCallback<Movie> callback) {
         Uri.Builder builder = getBuilder();
         builder.appendEncodedPath("movie/" + id);
         builder.appendQueryParameter("append_to_response", "images");
@@ -272,7 +272,7 @@ public class BaseWebService extends WebService {
         get(builder, callback, "movie_" + id);
     }
 
-    private void getTV(final long id, RequestCallback<TV> callback) {
+    public void getTV(final long id, RequestCallback<TV> callback) {
         Uri.Builder builder = getBuilder();
         builder.appendEncodedPath("tv/" + id);
         builder.appendQueryParameter("append_to_response", "images");

@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import ch.watched.R;
+import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.SearchMovie;
 import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
@@ -38,6 +40,10 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
         notifyDataSetChanged();
     }
 
+    public SearchMovie getItem(int position) {
+        return mMovies.get(position);
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         return new ViewHolder(
@@ -54,7 +60,7 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
         holder.date.setText(movie.getDate());
         holder.description.setText(movie.getOverview());
         GenreManager.instance().populate(movie.getGenres(), holder.genres);
-
+        holder.pinned.setChecked(DatabaseService.getInstance().contains(movie));
     }
 
     @Override
@@ -69,6 +75,7 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
         public TextView date;
         public TextView description;
         public TextView genres;
+        public RadioButton pinned;
 
         public ViewHolder(View view) {
             super(view);
@@ -78,6 +85,7 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
             date = (TextView) view.findViewById(R.id.media_date);
             description = (TextView) view.findViewById(R.id.media_description);
             genres = (TextView) view.findViewById(R.id.media_genres);
+            pinned = (RadioButton) view.findViewById(R.id.pin_indicator);
         }
     }
 }
