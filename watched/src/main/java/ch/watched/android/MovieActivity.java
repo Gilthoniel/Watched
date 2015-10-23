@@ -2,24 +2,20 @@ package ch.watched.android;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.*;
 import ch.watched.R;
 import ch.watched.android.constants.Constants;
-import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Backdrop;
 import ch.watched.android.models.Movie;
 import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
-
-import java.util.concurrent.Callable;
 
 
 public class MovieActivity extends AppCompatActivity {
@@ -47,7 +43,7 @@ public class MovieActivity extends AppCompatActivity {
         mMovie = DatabaseService.getInstance().getMovie(mID);
 
         ((TextView) findViewById(R.id.media_title)).setText(mMovie.getTitle());
-        ((TextView) findViewById(R.id.media_genres)).setText(Utils.join(mMovie.getGenres()));
+        GenreManager.instance().populate(mMovie.getGenres(), (TextView) findViewById(R.id.media_genres));
         ((TextView) findViewById(R.id.media_overview)).setText(mMovie.getOverview());
         ((RatingBar) findViewById(R.id.media_rating)).setRating(mMovie.getRating());
         ((TextView) findViewById(R.id.media_date)).setText(mMovie.getDate());

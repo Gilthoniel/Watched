@@ -1,5 +1,6 @@
 package ch.watched.android.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import ch.watched.R;
 import ch.watched.android.database.DatabaseService;
-import ch.watched.android.models.SearchMovie;
+import ch.watched.android.models.Media;
 import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
 
@@ -23,25 +24,31 @@ import java.util.List;
  */
 public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapter.ViewHolder> {
 
-    List<SearchMovie> mMovies;
+    private List<Media> mMedias;
+    private Context mContext;
 
-    public DiscoverCardAdapter() {
-        mMovies = new LinkedList<>();
+    public DiscoverCardAdapter(Context context) {
+        mMedias = new LinkedList<>();
+        mContext = context;
     }
 
-    public void putAll(Collection<SearchMovie> collection) {
-        mMovies.clear();
-        mMovies.addAll(collection);
+    public void putAll(Collection<? extends Media> collection) {
+        mMedias.clear();
+        mMedias.addAll(collection);
         notifyDataSetChanged();
     }
 
-    public void addAll(Collection<SearchMovie> collection) {
-        mMovies.addAll(collection);
+    public void addAll(Collection<? extends Media> collection) {
+        mMedias.addAll(collection);
         notifyDataSetChanged();
     }
 
-    public SearchMovie getItem(int position) {
-        return mMovies.get(position);
+    public Media getItem(int position) {
+        return mMedias.get(position);
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     @Override
@@ -53,8 +60,9 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        SearchMovie movie = mMovies.get(position);
+        Media movie = mMedias.get(position);
 
+        holder.image.setImageBitmap(null);
         ImageLoader.instance.get(movie.getPoster(), holder.image, ImageLoader.ImageType.POSTER);
         holder.title.setText(movie.getTitle());
         holder.date.setText(movie.getDate());
@@ -65,7 +73,7 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
 
     @Override
     public int getItemCount() {
-        return mMovies.size();
+        return mMedias.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

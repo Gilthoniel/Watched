@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/src/main/res/values/pref_discover_sorting.xml -->
+    <eat-comment/>
+    <string-array name="pref_discover_sort_names">
+        <item>Most popular</item>
+        <item>Most unpopular</item>
+        <item>Most recent</item>
+        <item>Most old</item>
+        <item>Best score</item>
+        <item>Worst score</item>
+    </string-array>
+    <string-array name="pref_discover_sort_values">
+        <item>popularity.desc</item>
+        <item>popularity.asc</item>
+        <item>release_date.desc</item>
+        <item>release_date.asc</item>
+        <item>vote_average.desc</item>
+        <item>vote_average.asc</item>
+    </string-array>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/src/main/res/values/pref_discover_types_name.xml -->
+    <eat-comment/>
+    <string-array name="pref_discover_types_name">
+        <item>Movies</item>
+        <item>TV Shows</item>
+    </string-array>
+    <string-array name="pref_discover_types_values">
+        <item>movie</item>
+        <item>tv</item>
+    </string-array>
     <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/values/values.xml -->
     <eat-comment/>
     <attr format="reference" name="drawerArrowStyle"/>
@@ -38,7 +66,7 @@
     <color name="bright_foreground_material_light">@android:color/black</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="button_material_light">#ffd6d7d7</color>
-    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/res/values/values.xml -->
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.1/res/values/values.xml -->
     <eat-comment/>
     <color name="cardview_dark_background">#FF202020</color>
     <color name="cardview_light_background">#FFFAFAFA</color>
@@ -108,6 +136,7 @@
     <declare-styleable name="MenuView"><attr name="android:itemTextAppearance"/><attr name="android:horizontalDivider"/><attr name="android:verticalDivider"/><attr name="android:headerBackground"/><attr name="android:itemBackground"/><attr name="android:windowAnimationStyle"/><attr name="android:itemIconDisabledAlpha"/><attr format="boolean" name="preserveIconSpacing"/></declare-styleable>
     <declare-styleable name="PopupWindow"><attr format="boolean" name="overlapAnchor"/><attr name="android:popupBackground"/></declare-styleable>
     <declare-styleable name="PopupWindowBackgroundState"><attr format="boolean" name="state_above_anchor"/></declare-styleable>
+    <declare-styleable name="RecyclerView"><attr format="string" name="layoutManager"/><attr name="android:orientation"/><attr format="integer" name="spanCount"/><attr format="boolean" name="reverseLayout"/><attr format="boolean" name="stackFromEnd"/></declare-styleable>
     <declare-styleable name="SearchView"><attr format="reference" name="layout"/><attr format="boolean" name="iconifiedByDefault"/><attr name="android:maxWidth"/><attr format="string" name="queryHint"/><attr format="string" name="defaultQueryHint"/><attr name="android:imeOptions"/><attr name="android:inputType"/><attr format="reference" name="closeIcon"/><attr format="reference" name="goIcon"/><attr format="reference" name="searchIcon"/><attr format="reference" name="searchHintIcon"/><attr format="reference" name="voiceIcon"/><attr format="reference" name="commitIcon"/><attr format="reference" name="suggestionRowLayout"/><attr format="reference" name="queryBackground"/><attr format="reference" name="submitBackground"/><attr name="android:focusable"/></declare-styleable>
     <declare-styleable name="Spinner"><attr name="android:prompt"/><attr name="popupTheme"/><attr name="android:popupBackground"/><attr name="android:dropDownWidth"/></declare-styleable>
     <declare-styleable name="SwitchCompat"><attr name="android:thumb"/><attr format="reference" name="track"/><attr name="android:textOn"/><attr name="android:textOff"/><attr format="dimension" name="thumbTextPadding"/><attr format="reference" name="switchTextAppearance"/><attr format="dimension" name="switchMinWidth"/><attr format="dimension" name="switchPadding"/><attr format="boolean" name="splitTrack"/><attr format="boolean" name="showText"/></declare-styleable>
@@ -183,7 +212,7 @@
     <eat-comment/>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/res/values/values.xml -->
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.1/res/values/values.xml -->
     <eat-comment/>
     <dimen name="cardview_compat_inset_shadow">1dp</dimen>
     <dimen name="cardview_default_elevation">2dp</dimen>
@@ -199,6 +228,11 @@
     <item format="float" name="highlight_alpha_material_colored" type="dimen">0.26</item>
     <item format="float" name="highlight_alpha_material_dark" type="dimen">0.20</item>
     <item format="float" name="highlight_alpha_material_light" type="dimen">0.12</item>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.0.1/res/values/values.xml -->
+    <eat-comment/>
+    <dimen name="item_touch_helper_max_drag_scroll_per_frame">20dp</dimen>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/values/values.xml -->
+    <eat-comment/>
     <dimen name="notification_large_icon_height">64dp</dimen>
     <dimen name="notification_large_icon_width">64dp</dimen>
     <dimen name="notification_subtext_size">12dp</dimen>
@@ -208,6 +242,11 @@
     <item name="action_menu_divider" type="id"/>
     <item name="action_menu_presenter" type="id"/>
     <item name="home" type="id"/>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.0.1/res/values/values.xml -->
+    <eat-comment/>
+    <item name="item_touch_helper_previous_elevation" type="id"/>
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/values/values.xml -->
+    <eat-comment/>
     <item name="progress_circular" type="id"/>
     <item name="progress_horizontal" type="id"/>
     <item name="split_action_bar" type="id"/>
@@ -251,6 +290,7 @@
     <string name="title_activity_home">Watched</string>
     <string name="title_activity_movie">MovieActivity</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_settings">Discover settings</string>
     <string name="title_activity_tv">TV Show</string>
     <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/values/values.xml -->
     <eat-comment/>
@@ -1181,7 +1221,7 @@
         <item name="android:minWidth">56dp</item>
         <item name="android:scaleType">center</item>
     </style>
-    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/res/values/values.xml -->
+    <!-- From: file:/F:/Developpement/Grim/Watched/watched/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.1/res/values/values.xml -->
     <eat-comment/>
     <style name="CardView">
         <item name="cardBackgroundColor">@color/cardview_light_background</item>

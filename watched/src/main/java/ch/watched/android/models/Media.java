@@ -14,6 +14,7 @@ public abstract class Media {
     public abstract float getRating();
     public abstract String getOverview();
     public abstract String getDate();
+    public abstract long[] getGenres();
 
     public String getNextMedia() {
         return "";

@@ -3,22 +3,20 @@ package ch.watched.android.fragments;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+import android.view.*;
 import ch.watched.R;
+import ch.watched.android.SettingsDiscoverActivity;
 import ch.watched.android.adapters.DiscoverCardAdapter;
 import ch.watched.android.constants.Utils;
-import ch.watched.android.models.SearchMovie;
+import ch.watched.android.models.Media;
 import ch.watched.android.service.BaseWebService;
-import ch.watched.android.service.utils.RequestCallback;
 import ch.watched.android.views.RecyclerItemClickListener;
-
-import java.lang.reflect.Type;
 
 /**
  * Created by Gaylor on 20.10.2015.
@@ -29,7 +27,7 @@ public class DiscoverFragment extends HomeFragment {
     private DiscoverCardAdapter mAdapter;
     private AlertDialog mDialog;
     private ProgressDialog mProgress;
-    private SearchMovie mCurrent;
+    private Media mCurrent;
 
     @Override
     public String getTitle() {
@@ -38,31 +36,23 @@ public class DiscoverFragment extends HomeFragment {
 
     @Override
     public void reload() {
-        if (getView() == null) {
+        if (getView() == null || getContext() == null) {
             return;
         }
 
-        BaseWebService.instance.discover(new RequestCallback<SearchMovie.Wrapper>() {
-            @Override
-            public void onSuccess(SearchMovie.Wrapper result) {
-                mAdapter.putAll(result.results);
-            }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String type = prefs.getString("pref_discover_type", "movie");
+        String sort = prefs.getString("pref_discover_sort", "popularity.desc");
+        int date_ge = prefs.getInt("pref_discover_date_ge", 1900);
 
-            @Override
-            public void onFailure(Errors error) {
-                Toast.makeText(getContext(), "An error occurred :(", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public Type getType() {
-                return SearchMovie.Wrapper.class;
-            }
-        });
+        BaseWebService.instance.discover(type, sort, date_ge, mAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle states) {
-        return inflater.inflate(R.layout.activity_discover, parent, false);
+        setHasOptionsMenu(true);
+
+        return inflater.inflate(R.layout.fragment_discover, parent, false);
     }
 
     @Override
@@ -126,9 +116,26 @@ public class DiscoverFragment extends HomeFragment {
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recycler.setLayoutManager(layoutManager);
 
-        mAdapter = new DiscoverCardAdapter();
+        mAdapter = new DiscoverCardAdapter(getContext());
         recycler.setAdapter(mAdapter);
 
         reload();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_home_discover, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.menu_filters && getView() != null) {
+            Intent intent = new Intent(getContext(), SettingsDiscoverActivity.class);
+            startActivity(intent);
+        }
+
+        return false;
     }
 }

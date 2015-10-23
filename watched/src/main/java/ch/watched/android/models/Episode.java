@@ -3,7 +3,6 @@ package ch.watched.android.models;
 import android.content.ContentValues;
 import android.database.Cursor;
 import ch.watched.android.database.DatabaseService;
-import ch.watched.android.database.EpisodeContract;
 import ch.watched.android.database.EpisodeContract.EpisodeEntry;
 import ch.watched.android.database.WatcherDbHelper;
 
@@ -75,6 +74,10 @@ public class Episode extends Media implements Serializable {
 
     public float getRating() {
         return vote_average;
+    }
+
+    public long[] getGenres() {
+        return new long[0];
     }
 
     public long getTV_ID() {

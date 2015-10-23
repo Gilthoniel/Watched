@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Media">
+
+        <ListPreference
+            android:key="pref_discover_type"
+            android:title="Media type"
+            android:dialogTitle="Choose what you want to be displayed"
+            android:summary=""
+            android:entries="@array/pref_discover_types_name"
+            android:entryValues="@array/pref_discover_types_values"
+            android:defaultValue="movie" />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Filters">
+
+        <ListPreference
+            android:key="pref_discover_sort"
+            android:title="Sorting"
+            android:dialogTitle="Sorting option ?"
+            android:summary=""
+            android:entries="@array/pref_discover_sort_names"
+            android:entryValues="@array/pref_discover_sort_values"
+            android:defaultValue="popularity.desc" />
+
+        <ch.watched.android.views.YearPickerPreference
+            android:key="pref_discover_date_ge"
+            android:title="Minimal Release Date"
+            android:defaultValue="1900" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

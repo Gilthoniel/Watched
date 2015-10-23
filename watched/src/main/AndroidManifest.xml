@@ -9,11 +9,10 @@
     <application
         android:name=".android.BaseApplication"
         android:allowBackup="true"
+        android:backupAgent=".android.service.BaseBackupAgent"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:backupAgent=".android.service.BaseBackupAgent">
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".android.HomeActivity"
             android:label="@string/title_activity_home"
@@ -60,8 +59,18 @@
                 android:value="ch.watched.android.HomeActivity" />
         </activity>
 
-        <meta-data android:name="com.google.android.backup.api_key"
-                   android:value="AEdPqrEAAAAI7Vwn_VYa49k4b-DDuNH8VqCL1HH8YbfBciDddw" />
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAI7Vwn_VYa49k4b-DDuNH8VqCL1HH8YbfBciDddw" />
 
+        <activity
+            android:name=".android.SettingsDiscoverActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".android.HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.watched.android.MovieActivity" />
+        </activity>
     </application>
+
 </manifest>

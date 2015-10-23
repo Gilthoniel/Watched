@@ -20,7 +20,7 @@ import java.util.Locale;
 public class Utils {
 
     private static final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy", Locale.getAvailableLocales()[0]);
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy", Locale.US);
 
     public static byte[] getBytes(Object object) {
 
@@ -86,7 +86,15 @@ public class Utils {
         return dialog;
     }
 
+    public static void setLocaleDate(Locale locale) {
+        dateFormatter = new SimpleDateFormat("dd MMM yyyy", locale);
+    }
+
     public static String parseDate(String date) {
+        if (date == null) {
+            return "";
+        }
+
         try {
             return dateFormatter.format(dateParser.parse(date));
         } catch (ParseException e) {

@@ -64,6 +64,7 @@ public class SearchMovie extends Media implements Serializable {
         return Utils.parseDate(release_date);
     }
 
+    @Override
     public long[] getGenres() {
         return genre_ids;
     }

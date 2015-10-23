@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
+import ch.watched.android.adapters.DiscoverCardAdapter;
 import ch.watched.android.adapters.MediaSearchAdapter;
 import ch.watched.android.constants.Constants;
 import ch.watched.android.constants.Utils;
@@ -11,8 +12,8 @@ import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.*;
 import ch.watched.android.service.utils.RequestCallback;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.List;
 
 /**
  * Created by gaylor on 08/29/2015.
@@ -205,9 +206,48 @@ public class BaseWebService extends WebService {
         });
     }
 
-    public void discover(RequestCallback<SearchMovie.Wrapper> callback) {
+    public void discover(String type, String sorting, int date_ge, final DiscoverCardAdapter adapter) {
         Uri.Builder builder = getBuilder();
-        builder.appendEncodedPath("discover/movie");
+        builder.appendEncodedPath("discover/" + type);
+        builder.appendQueryParameter("sort_by", sorting);
+        builder.appendQueryParameter("primary_release_date.gte", date_ge+"-01-01");
+
+        RequestCallback<? extends Serializable> callback;
+        if (type.equals("movie")) {
+            callback = new RequestCallback<SearchMovie.Wrapper>() {
+                @Override
+                public void onSuccess(SearchMovie.Wrapper result) {
+                    adapter.putAll(result.results);
+                }
+
+                @Override
+                public void onFailure(Errors error) {
+                    Toast.makeText(adapter.getContext(), "An error occurred :(", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public Type getType() {
+                    return SearchMovie.Wrapper.class;
+                }
+            };
+        } else {
+            callback = new RequestCallback<SearchTV.Wrapper>() {
+                @Override
+                public void onSuccess(SearchTV.Wrapper result) {
+                    adapter.putAll(result.results);
+                }
+
+                @Override
+                public void onFailure(Errors error) {
+                    Toast.makeText(adapter.getContext(), "An error occurred :(", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public Type getType() {
+                    return SearchTV.Wrapper.class;
+                }
+            };
+        }
 
         get(builder, callback, null);
     }

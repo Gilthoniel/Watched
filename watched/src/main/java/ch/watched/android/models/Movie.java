@@ -101,8 +101,14 @@ public class Movie extends Media implements Serializable {
         return images.backdrops;
     }
 
-    public List<Genre> getGenres() {
-        return genres;
+    @Override
+    public long[] getGenres() {
+        long[] ids = new long[genres.size()];
+        for (int i = 0; i < genres.size(); i++) {
+            ids[i] = genres.get(i).id;
+        }
+
+        return ids;
     }
 
     @Override

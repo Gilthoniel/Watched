@@ -31,7 +31,10 @@ public class ImageLoader {
 
     private LinkedList<String> mStack;
     private Map<String, Bitmap> mImages;
-    private Map<String, Set<ImageView>> mViews;
+
+    private Map<ImageView, String> mViews;
+    private Set<String> mRequests;
+
     private MovieDBConfiguration mConfig;
     private final Object mLock;
 
@@ -40,6 +43,7 @@ public class ImageLoader {
 
         mStack = new LinkedList<>();
         mViews = new HashMap<>();
+        mRequests = new HashSet<>();
         mImages = new HashMap<>();
 
         BaseWebService.instance.getConfiguration(new RequestCallback<MovieDBConfiguration>() {
@@ -83,18 +87,13 @@ public class ImageLoader {
 
         image.setImageBitmap(null);
         image.invalidate();
+        mViews.put(image, url);
 
         // Looking for a request already launched
-        if (mViews.containsKey(url)) {
-            mViews.get(url).add(image);
-            return;
-        } else {
-
-            mViews.put(url, new HashSet<ImageView>());
-            mViews.get(url).add(image);
+        if (!mRequests.contains(url)) {
+            mRequests.add(url);
+            new ImageTask(type).executeOnExecutor(ConnectionService.instance.getExecutor(), url);
         }
-
-        new ImageTask(type).executeOnExecutor(ConnectionService.instance.getExecutor(), url);
     }
 
     public void get(final String url, final ImageView image) {
@@ -181,11 +180,16 @@ public class ImageLoader {
                     mImages.remove(key);
                 }
 
-                if (mViews.containsKey(mUrl)) {
-                    for (ImageView view : mViews.get(mUrl)) {
-                        view.setImageBitmap(bitmap);
-                        view.setVisibility(View.VISIBLE);
-                        view.invalidate();
+                Iterator<Map.Entry<ImageView, String>> it = mViews.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<ImageView, String> entry = it.next();
+
+                    if (entry.getValue().equals(mUrl)) {
+                        entry.getKey().setImageBitmap(bitmap);
+                        entry.getKey().setVisibility(View.VISIBLE);
+                        entry.getKey().invalidate();
+
+                        it.remove();
                     }
                 }
 
@@ -194,7 +198,7 @@ public class ImageLoader {
                 Log.e("--IMAGE--", "Null value for an image");
             }
 
-            mViews.remove(mUrl);
+            mRequests.remove(mUrl);
         }
     }
 }

@@ -20,7 +20,7 @@ public class SearchTV extends Media implements Serializable {
 
     private String backdrop_path;
     private String first_air_date;
-    private List<Integer> genre_ids;
+    private long[] genre_ids;
     private long id;
     private String original_language;
     private String original_name;
@@ -60,6 +60,11 @@ public class SearchTV extends Media implements Serializable {
     @Override
     public String getDate() {
         return first_air_date;
+    }
+
+    @Override
+    public long[] getGenres() {
+        return genre_ids;
     }
 
     @Override

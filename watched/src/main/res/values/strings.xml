@@ -9,6 +9,7 @@
     <string name="search_button_name">Search</string>
     <string name="title_activity_tv">TV Show</string>
     <string name="title_activity_movie">MovieActivity</string>
+    <string name="title_activity_settings">Discover settings</string>
 
     <string name="report_bug">Bug report sent to the developer! Sorry for that :(</string>
     <string name="image_description">Poster</string>

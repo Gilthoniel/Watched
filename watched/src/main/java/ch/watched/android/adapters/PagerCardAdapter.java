@@ -24,7 +24,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
     List<T> mMedias;
     SparseArray<View> mViews;
-    Class<?> mClass;
+    Class<?> mClass; // Activity opened when a click occurred
 
     public PagerCardAdapter(List<T> medias, Class<?> activity) {
         super();
@@ -36,6 +36,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
     public void putAll(List<T> medias) {
         mMedias.clear();
+        mViews.clear();
         mMedias.addAll(medias);
 
         notifyDataSetChanged();
@@ -120,7 +121,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
                 } else {
                     textNext.animate()
                             .alpha(0.0f)
-                            .setDuration(500)
+                            .setDuration(100)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
@@ -128,7 +129,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
                                     textNext.animate()
                                             .alpha(1.0f)
-                                            .setDuration(500)
+                                            .setDuration(100)
                                             .start();
                                 }
                             })

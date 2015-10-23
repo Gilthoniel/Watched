@@ -90,6 +90,16 @@ public class TV extends Media implements Serializable {
         return first_air_date;
     }
 
+    @Override
+    public long[] getGenres() {
+        long[] ids = new long[genres.size()];
+        for (int i = 0; i < genres.size(); i++) {
+            ids[i] = genres.get(i).id;
+        }
+
+        return ids;
+    }
+
     public List<Season> getSeasons() {
         return seasons;
     }
