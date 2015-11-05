@@ -40,6 +40,8 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
         mMedias.addAll(medias);
 
         notifyDataSetChanged();
+
+
     }
 
     @Override
@@ -48,11 +50,11 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
         Iterator<T> it = mMedias.iterator();
         int removalIndex = -1;
-        for (int i = 0; i < mViews.size() && removalIndex < 0 && mViews.size() > i; i++) {
+        for (int i = 0; i < mViews.size() && removalIndex < 0; i++) {
             final View view = mViews.get(i);
             if (it.hasNext()) {
                 final Media media = it.next();
-                if (view.getTag() != media) {
+                if (view != null && view.getTag() != media) {
                     populateView(view, media, i);
                 }
             } else {

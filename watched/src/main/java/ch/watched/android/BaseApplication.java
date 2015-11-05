@@ -34,10 +34,13 @@ public class BaseApplication extends Application {
         CacheManager.init(getApplicationContext());
         DatabaseService.getInstance().initHelper(getApplicationContext());
 
+        /*
         if (BuildConfig.DEBUG) {
             Log.d("DEBUG MODE", "ACRA disabled");
         } else {
             ACRA.init(this);
         }
+        */
+        ACRA.init(this);
     }
 }
