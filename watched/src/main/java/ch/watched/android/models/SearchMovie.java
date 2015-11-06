@@ -1,10 +1,10 @@
 package ch.watched.android.models;
 
-import android.content.ContentValues;
 import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.MovieContract;
 import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.WebService;
 import ch.watched.android.service.utils.RequestCallback;
 
 import java.io.Serializable;
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by gaylor on 08/29/2015.
  * Movie model for a search
  */
-public class SearchMovie extends Media implements Serializable {
+public class SearchMovie implements Media, DatabaseItem, Serializable {
 
     private static final long serialVersionUID = -5855023050595050269L;
 
@@ -34,6 +34,7 @@ public class SearchMovie extends Media implements Serializable {
     private double vote_average;
     private int vote_count;
 
+    /** MEDIA INTERFACE **/
     @Override
     public long getID() {
         return id;
@@ -70,32 +71,57 @@ public class SearchMovie extends Media implements Serializable {
     }
 
     @Override
-    public String getSQLTable() {
-        return MovieContract.MovieEntry.TABLE_NAME;
+    public void setWatched(boolean isWatched) {
+        Movie movie = DatabaseService.getInstance().getMovie(id);
+        if (movie != null) {
+            movie.setWatched(true);
+        } else {
+            throw new IllegalStateException("Error when trying to mark a movie as watched but it is not in the database");
+        }
     }
 
-    @Override
-    public ContentValues getSQLValues() {
-
-        throw new UnsupportedOperationException("A search media doesn't fit in the database");
-    }
+    /** DATABASE_ITEM **/
 
     @Override
-    public void insertIntoDatabase(final Runnable runnable) {
+    public void insert(final Runnable afterAction) {
         BaseWebService.instance.getMovie(id, new RequestCallback<Movie>() {
             @Override
-            public void onSuccess(Movie movie) {
-                movie.insertIntoDatabase(runnable);
+            public void onSuccess(Movie result) {
+                result.insert(afterAction);
             }
 
             @Override
-            public void onFailure(Errors error) {}
+            public void onFailure(Errors error) {
+                // TODO
+            }
 
             @Override
             public Type getType() {
                 return Movie.class;
             }
         });
+    }
+
+    @Override
+    public void remove(Runnable afterAction) {
+        DatabaseService.getInstance().remove(MovieContract.MovieEntry.TABLE_NAME, id);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public void update(Runnable afterAction) {
+        Movie movie = DatabaseService.getInstance().getMovie(id);
+        if (movie != null) {
+            movie.update(afterAction);
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return DatabaseService.getInstance().contains(MovieContract.MovieEntry.TABLE_NAME, id);
     }
 
     public class Wrapper implements Serializable {

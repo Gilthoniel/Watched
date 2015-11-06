@@ -11,6 +11,7 @@ import ch.watched.android.MovieActivity;
 import ch.watched.android.TvActivity;
 import ch.watched.android.adapters.PagerCardAdapter;
 import ch.watched.android.database.DatabaseService;
+import ch.watched.android.models.Episode;
 import ch.watched.android.models.Movie;
 import ch.watched.android.models.TV;
 import ch.watched.android.views.PaginationView;
@@ -21,8 +22,8 @@ import ch.watched.android.views.PaginationView;
  */
 public class ResumeFragment extends HomeFragment {
 
-    private PagerCardAdapter<Movie> mMoviesAdapter;
-    private PagerCardAdapter<TV> mSeriesAdapter;
+    private PagerCardAdapter<Movie, Movie> mMoviesAdapter;
+    private PagerCardAdapter<Episode, TV> mSeriesAdapter;
 
     public String getTitle() {
         return "Selections";

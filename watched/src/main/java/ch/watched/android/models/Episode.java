@@ -12,7 +12,7 @@ import java.io.Serializable;
  * Created by Gaylor on 06.07.2015.
  * Episode from the MovieDatabase
  */
-public class Episode extends Media implements Serializable {
+public class Episode implements Media, DatabaseItem, Serializable {
 
     private static final long serialVersionUID = -8663364071143389959L;
 
@@ -92,14 +92,53 @@ public class Episode extends Media implements Serializable {
         return watched;
     }
 
-    public void setWatched(boolean watched) {
-        this.watched = watched;
+    public void setWatched(boolean isWatched) {
+        watched = isWatched;
 
-        DatabaseService.getInstance().update(this);
+        update(null);
+
+    }
+
+    /** DATABASE_ITEM implementation **/
+
+    @Override
+    public void insert(Runnable afterAction) {
+        DatabaseService.getInstance().insert(EpisodeEntry.TABLE_NAME, getContentValues());
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
     }
 
     @Override
-    public ContentValues getSQLValues() {
+    public void remove(Runnable afterAction) {
+        DatabaseService.getInstance().remove(EpisodeEntry.TABLE_NAME, id);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public void update(Runnable afterAction) {
+        DatabaseService.getInstance().update(EpisodeEntry.TABLE_NAME, getContentValues());
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return DatabaseService.getInstance().contains(EpisodeEntry.TABLE_NAME, id);
+    }
+
+    @Override
+    public String toString() {
+        return "Episode " + episode_number + ", Season" + season_number;
+    }
+
+    private ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(EpisodeEntry.COLUMN_DATE, air_date);
@@ -113,21 +152,5 @@ public class Episode extends Media implements Serializable {
         values.put(WatcherDbHelper.COLUMN_WATCHED, watched);
 
         return values;
-    }
-
-    @Override
-    public String getSQLTable() {
-        return EpisodeEntry.TABLE_NAME;
-    }
-
-    @Override
-    public void insertIntoDatabase(Runnable runnable) {
-        DatabaseService.getInstance().insert(this);
-        runnable.run();
-    }
-
-    @Override
-    public String toString() {
-        return "Episode["+id+", "+episode_number+", "+season_number+", "+name+"]";
     }
 }

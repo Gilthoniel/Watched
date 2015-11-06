@@ -20,7 +20,7 @@ import java.util.List;
  * Created by Gaylor on 23.09.2015.
  *
  */
-public class PagerCardAdapter<T extends Media> extends PagerAdapter {
+public class PagerCardAdapter<U extends Media, T extends Media & Iterable<U>> extends PagerAdapter {
 
     List<T> mMedias;
     SparseArray<View> mViews;
@@ -53,7 +53,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
         for (int i = 0; i < mViews.size() && removalIndex < 0; i++) {
             final View view = mViews.get(i);
             if (it.hasNext()) {
-                final Media media = it.next();
+                final T media = it.next();
                 if (view != null && view.getTag() != media) {
                     populateView(view, media, i);
                 }
@@ -86,7 +86,7 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
 
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
-        final Media media = mMedias.get(position);
+        final T media = mMedias.get(position);
 
         final View view = LayoutInflater.from(container.getContext()).inflate(R.layout.item_card_media, container, false);
         mViews.put(position, view);
@@ -102,43 +102,16 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
         container.removeView((View) object);
     }
 
-    private void populateView(View view, final Media media, final int position) {
+    private void populateView(View view, final T media, final int position) {
         // Set tag for testing if the view is already filled with the good information
         view.setTag(media);
 
         ((TextView) view.findViewById(R.id.media_title)).setText(media.getTitle());
         ((TextView) view.findViewById(R.id.media_overview)).setText(media.getOverview());
-        final TextView textNext = (TextView) view.findViewById(R.id.next_episode);
-        textNext.setText(media.getNextMedia());
-        ImageView poster = (ImageView) view.findViewById(R.id.media_poster);
-        poster.setImageBitmap(null);
-        ImageLoader.instance.get(media.getPoster(), poster);
 
-        view.findViewById(R.id.button_next).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View button) {
-                if (media.next()) {
-                    mMedias.remove(position);
-                    notifyDataSetChanged();
-                } else {
-                    textNext.animate()
-                            .alpha(0.0f)
-                            .setDuration(100)
-                            .withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    textNext.setText(media.getNextMedia());
+        Iterator<U> it = media.iterator();
+        view.findViewById(R.id.button_next).setOnClickListener(new NextOnClickListener(media, view));
 
-                                    textNext.animate()
-                                            .alpha(1.0f)
-                                            .setDuration(100)
-                                            .start();
-                                }
-                            })
-                            .start();
-                }
-            }
-        });
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,5 +121,68 @@ public class PagerCardAdapter<T extends Media> extends PagerAdapter {
                 view.getContext().startActivity(intent);
             }
         });
+
+        ImageView poster = (ImageView) view.findViewById(R.id.media_poster);
+        poster.setImageBitmap(null);
+        ImageLoader.instance.get(media.getPoster(), poster);
+    }
+
+    /**
+     * Action when the user click on the validate button to mark a media as watched and get the next or remove from
+     * the unwatched selection
+     */
+    private class NextOnClickListener implements View.OnClickListener {
+
+        private Iterator<U> mIterator;
+        private T mMedia;
+        private View mView;
+        private TextView mTextNext;
+        private U mOld;
+
+        public NextOnClickListener(T media, View parent) {
+            mMedia = media;
+            mIterator = media.iterator();
+            mView = parent;
+            mTextNext = (TextView) mView.findViewById(R.id.next_episode);
+
+            if (mIterator.hasNext()) {
+                mOld = mIterator.next();
+                mTextNext.setText(mOld.toString());
+            }
+        }
+
+        @Override
+        public void onClick(View button) {
+            // Mark as watched
+            if (mOld != null) {
+                mOld.setWatched(true);
+            }
+
+            if (mIterator.hasNext()) {
+                final U next = mIterator.next();
+
+                // Update text
+                mTextNext.animate()
+                        .alpha(0.0f)
+                        .setDuration(100)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTextNext.setText(next.toString());
+
+                                mTextNext.animate()
+                                        .alpha(1.0f)
+                                        .setDuration(100)
+                                        .start();
+                            }
+                        })
+                        .start();
+
+                mOld = next;
+            } else {
+                mMedias.remove(mMedia); // TODO
+                notifyDataSetChanged();
+            }
+        }
     }
 }

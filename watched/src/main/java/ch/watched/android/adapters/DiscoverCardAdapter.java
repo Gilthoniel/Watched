@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import ch.watched.R;
-import ch.watched.android.database.DatabaseService;
 import ch.watched.android.models.Media;
 import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
@@ -68,7 +67,7 @@ public class DiscoverCardAdapter extends RecyclerView.Adapter<DiscoverCardAdapte
         holder.date.setText(movie.getDate());
         holder.description.setText(movie.getOverview());
         GenreManager.instance().populate(movie.getGenres(), holder.genres);
-        holder.pinned.setChecked(DatabaseService.getInstance().contains(movie));
+        holder.pinned.setChecked(movie.exists());
     }
 
     @Override

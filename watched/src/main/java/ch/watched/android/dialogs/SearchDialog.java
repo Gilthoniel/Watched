@@ -56,11 +56,11 @@ public class SearchDialog extends DialogFragment {
             }
         });
 
-        if (DatabaseService.getInstance().contains(mMedia)) {
+        if (mMedia.exists()) {
             builder.setPositiveButton("Unpinned", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
-                    DatabaseService.getInstance().remove(mMedia);
+                    mMedia.remove(null);
 
                     mAdapter.notifyDataSetChanged();
                     dialog.dismiss();
@@ -71,13 +71,18 @@ public class SearchDialog extends DialogFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
 
-                    if (mMedia.getSQLTable().equals(MovieContract.MovieEntry.TABLE_NAME)) {
-                        BaseWebService.instance.insertMovie(mMedia.getID(), mAdapter);
-                    } else {
-                        BaseWebService.instance.insertTV((int) mMedia.getID(), mAdapter);
-                    }
-
                     dialog.dismiss();
+
+                    final Dialog progress = Utils.createProgressDialog(mAdapter.getContext());
+                    progress.show();
+
+                    mMedia.insert(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                            progress.dismiss();
+                        }
+                    });
                 }
             });
         }

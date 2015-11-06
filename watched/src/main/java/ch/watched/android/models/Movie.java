@@ -4,19 +4,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
-import ch.watched.android.database.MovieContract;
 import ch.watched.android.database.MovieContract.MovieEntry;
 import ch.watched.android.database.WatcherDbHelper;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Gaylor on 30.06.2015.
  * Movie data of the MovieDB
  */
-public class Movie extends Media implements Serializable {
+public class Movie implements Media, DatabaseItem, Serializable, Iterable<Movie> {
 
     private static final long serialVersionUID = -2183465616196807646L;
 
@@ -92,9 +92,10 @@ public class Movie extends Media implements Serializable {
         return isWatched;
     }
 
+    @Override
     public void setWatched(boolean value) {
         isWatched = value;
-        DatabaseService.getInstance().update(this);
+        update(null);
     }
 
     public List<Backdrop> getBackdrops() {
@@ -111,14 +112,10 @@ public class Movie extends Media implements Serializable {
         return ids;
     }
 
-    @Override
-    public boolean next() {
-        setWatched(true);
-        return true;
-    }
+    /** DATABASE_ITEM implementation **/
 
     @Override
-    public ContentValues getSQLValues() {
+    public void insert(Runnable afterAction) {
         ContentValues values = new ContentValues();
         values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(MovieEntry.COLUMN_TITLE, title);
@@ -130,18 +127,76 @@ public class Movie extends Media implements Serializable {
         values.put(MovieEntry.COLUMN_BACKDROPS, Utils.getBytes(images.backdrops));
         values.put(MovieEntry.COLUMN_GENRES, Utils.getBytes(genres));
 
-        return values;
+        DatabaseService.getInstance().insert(MovieEntry.TABLE_NAME, values);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
     }
 
     @Override
-    public String getSQLTable() {
-        return MovieEntry.TABLE_NAME;
+    public void remove(Runnable afterAction) {
+        DatabaseService.getInstance().remove(MovieEntry.TABLE_NAME, id);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
     }
 
     @Override
-    public void insertIntoDatabase(Runnable runnable) {
-        DatabaseService.getInstance().insert(this);
-        runnable.run();
+    public void update(Runnable afterAction) {
+        ContentValues values = new ContentValues();
+        values.put(WatcherDbHelper.COLUMN_ID, id);
+        values.put(MovieEntry.COLUMN_TITLE, title);
+        values.put(WatcherDbHelper.COLUMN_WATCHED, isWatched);
+        values.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        values.put(MovieEntry.COLUMN_IMAGE, poster_path);
+        values.put(MovieEntry.COLUMN_RELEASE, release_date);
+        values.put(MovieEntry.COLUMN_SCORE, vote_average);
+        values.put(MovieEntry.COLUMN_BACKDROPS, Utils.getBytes(images.backdrops));
+        values.put(MovieEntry.COLUMN_GENRES, Utils.getBytes(genres));
+
+        DatabaseService.getInstance().update(MovieEntry.TABLE_NAME, values);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return DatabaseService.getInstance().contains(MovieEntry.TABLE_NAME, id);
+    }
+
+    @Override
+    public Iterator<Movie> iterator() {
+        return new Iterator<Movie>() {
+            Movie pointer = Movie.this;
+
+            @Override
+            public boolean hasNext() {
+                return pointer != null;
+            }
+
+            @Override
+            public Movie next() {
+                Movie temp = pointer;
+                pointer = null;
+                return temp;
+            }
+
+            @Override
+            public void remove() {
+                if (pointer != null) {
+                    pointer.remove(null);
+                }
+            }
+        };
+    }
+
+    @Override
+    public String toString() {
+        return "";
     }
 
     private class ImagesWrapper implements Serializable {

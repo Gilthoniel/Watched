@@ -2,21 +2,24 @@ package ch.watched.android.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 import ch.watched.android.constants.Utils;
 import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.TVContract;
 import ch.watched.android.database.WatcherDbHelper;
+import ch.watched.android.service.BaseWebService;
+import ch.watched.android.service.utils.RequestCallback;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.*;
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Gaylor on 07.07.2015.
  * TV Show for MovieDatabase
  */
-public class TV extends Media implements Serializable {
+public class TV implements Media, DatabaseItem, Serializable, Iterable<Episode> {
 
     private static final long serialVersionUID = -968718735212066593L;
 
@@ -33,7 +36,7 @@ public class TV extends Media implements Serializable {
     private String status;
     private String type;
     private float vote_average;
-    private List<Season> seasons;
+    private List<SeasonWrapper> seasons;
     private List<Genre> genres;
     private ImagesWrapper images;
     private String first_air_date;
@@ -100,7 +103,16 @@ public class TV extends Media implements Serializable {
         return ids;
     }
 
-    public List<Season> getSeasons() {
+    @Override
+    public void setWatched(boolean isWatched) {
+        for (List<Episode> episodes : DatabaseService.getInstance().getEpisodes(id).values()) {
+            for (Episode episode : episodes) {
+                episode.setWatched(true);
+            }
+        }
+    }
+
+    public List<SeasonWrapper> getSeasons() {
         return seasons;
     }
 
@@ -108,26 +120,98 @@ public class TV extends Media implements Serializable {
         return images.backdrops;
     }
 
-    @Override
-    public String getNextMedia() {
-
-        Episode episode = DatabaseService.getInstance().getUnwatchedEpisode(id);
-        return "Season " + episode.getSeasonNumber() + " - Episode " + episode.getEpisodeNumber();
-    }
+    /** DATABASE_ITEM implementation **/
 
     @Override
-    public boolean next() {
+    public void insert(Runnable afterAction) {
+        DatabaseService.getInstance().insert(TVContract.TVEntry.TABLE_NAME, getContentValues());
+        for (SeasonWrapper season : seasons) {
+            BaseWebService.instance.getSeason(id, season.season_number, new RequestCallback<Season>() {
+                @Override
+                public void onSuccess(Season result) {
+                    for (Episode episode : result.episodes) {
+                        episode.setTV_ID(id);
+                    }
 
-        Episode episode = DatabaseService.getInstance().getUnwatchedEpisode(id);
-        if (episode != null) {
-            episode.setWatched(true);
+                    result.insert(null);
+                }
+
+                @Override
+                public void onFailure(Errors error) {
+                    // TODO
+                }
+
+                @Override
+                public Type getType() {
+                    return Season.class;
+                }
+            });
         }
 
-        return DatabaseService.getInstance().getUnwatchedEpisode(id) == null;
+        if (afterAction != null) {
+            afterAction.run();
+        }
     }
 
     @Override
-    public ContentValues getSQLValues() {
+    public void remove(Runnable afterAction) {
+        DatabaseService.getInstance().remove(TVContract.TVEntry.TABLE_NAME, id);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public void update(Runnable afterAction) {
+        DatabaseService.getInstance().update(TVContract.TVEntry.TABLE_NAME, getContentValues());
+        for (SeasonWrapper season : seasons) {
+            BaseWebService.instance.getSeason(id, season.season_number, new RequestCallback<Season>() {
+                @Override
+                public void onSuccess(Season result) {
+                    for (Episode episode : result.episodes) {
+                        episode.setTV_ID(id);
+                    }
+
+                    result.update(null);
+                }
+
+                @Override
+                public void onFailure(Errors error) {
+                    // TODO
+                }
+
+                @Override
+                public Type getType() {
+                    return Season.class;
+                }
+            });
+        }
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return DatabaseService.getInstance().contains(TVContract.TVEntry.TABLE_NAME, id);
+    }
+
+    @Override
+    public Iterator<Episode> iterator() {
+        return DatabaseService.getInstance().getUnwatchedEpisode(id).iterator();
+    }
+
+    public class SeasonWrapper implements Serializable {
+
+        private static final long serialVersionUID = -968718735486066593L;
+
+        public long id;
+        public int season_number;
+    }
+
+    private ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put(WatcherDbHelper.COLUMN_ID, id);
         values.put(TVContract.TVEntry.COLUMN_HOMEPAGE, homepage);
@@ -148,25 +232,6 @@ public class TV extends Media implements Serializable {
         values.put(TVContract.TVEntry.COLUMN_END_DATE, last_air_date);
 
         return values;
-    }
-
-    @Override
-    public String getSQLTable() {
-        return TVContract.TVEntry.TABLE_NAME;
-    }
-
-    @Override
-    public void insertIntoDatabase(Runnable runnable) {
-        DatabaseService.getInstance().insert(this);
-        runnable.run();
-    }
-
-    public class Season implements Serializable {
-
-        private static final long serialVersionUID = -968718735486066593L;
-
-        public long id;
-        public int season_number;
     }
 
     private class ImagesWrapper implements Serializable {

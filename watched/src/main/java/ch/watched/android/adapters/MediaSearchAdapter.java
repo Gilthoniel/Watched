@@ -69,7 +69,7 @@ public class MediaSearchAdapter extends BaseAdapter {
         Media media = mMedias.get(position);
 
         RadioButton pinned = (RadioButton) layout.findViewById(R.id.radio_pinned);
-        pinned.setChecked(DatabaseService.getInstance().contains(media));
+        pinned.setChecked(media.exists());
         pinned.setText(media.getTitle());
 
         ImageView poster = (ImageView) layout.findViewById(R.id.media_poster);

@@ -16,6 +16,9 @@ import ch.watched.android.models.Movie;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
+import ch.watched.android.service.utils.RequestCallback;
+
+import java.lang.reflect.Type;
 
 
 public class MovieActivity extends AppCompatActivity {
@@ -103,23 +106,38 @@ public class MovieActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_remove:
 
-                DatabaseService.getInstance().remove(mMovie);
+                mMovie.remove(null);
                 finish();
                 return true;
 
             case R.id.action_seen:
 
                 mMovie.setWatched(!mMovie.isWatched());
+                mMovie.update(null);
                 checkIcon();
                 return true;
 
             case R.id.action_refresh:
-
-                BaseWebService.instance.updateMovie(mMovie, new BaseWebService.Callable() {
+                BaseWebService.instance.getMovie(mMovie.getID(), new RequestCallback<Movie>() {
                     @Override
-                    public void call() {
-                        recreate();
-                        Toast.makeText(getApplicationContext(), "Movie updated!", Toast.LENGTH_SHORT).show();
+                    public void onSuccess(Movie result) {
+                        result.update(new Runnable() {
+                            @Override
+                            public void run() {
+                                recreate();
+                                Toast.makeText(getApplicationContext(), "Movie updated!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Errors error) {
+                        // TODO
+                    }
+
+                    @Override
+                    public Type getType() {
+                        return Movie.class;
                     }
                 });
                 return true;

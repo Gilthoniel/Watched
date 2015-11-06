@@ -1,7 +1,6 @@
 package ch.watched.android.models;
 
-import android.content.ContentValues;
-import android.util.Log;
+import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.TVContract;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.utils.RequestCallback;
@@ -14,7 +13,7 @@ import java.util.List;
  * Created by Gaylor on 01.07.2015.
  * Represent a TV Show
  */
-public class SearchTV extends Media implements Serializable {
+public class SearchTV implements Media, DatabaseItem, Serializable {
 
     private static final long serialVersionUID = -4165225388926863214L;
 
@@ -68,34 +67,57 @@ public class SearchTV extends Media implements Serializable {
     }
 
     @Override
-    public String getSQLTable() {
-
-        return TVContract.TVEntry.TABLE_NAME;
+    public void setWatched(boolean isWatched) {
+        TV tv = DatabaseService.getInstance().getTV(id);
+        if (tv != null) {
+            tv.setWatched(true);
+        } else {
+            throw new IllegalStateException("Error when trying to mark a tv as watched but it is not in the database");
+        }
     }
 
-    @Override
-    public ContentValues getSQLValues() {
-        throw new UnsupportedOperationException("A search media doesn't fit in the database");
-    }
+    /** DATABASE_ITEM implementation **/
 
     @Override
-    public void insertIntoDatabase(final Runnable runnable) {
+    public void insert(final Runnable afterAction) {
         BaseWebService.instance.getTV(id, new RequestCallback<TV>() {
             @Override
             public void onSuccess(TV result) {
-                result.insertIntoDatabase(runnable);
+                result.insert(afterAction);
             }
 
             @Override
             public void onFailure(Errors error) {
-                Log.e("--INTERNET--", "Internet error: " + error.name());
+                // TODO
             }
 
             @Override
             public Type getType() {
-                return SearchTV.class;
+                return TV.class;
             }
         });
+    }
+
+    @Override
+    public void remove(Runnable afterAction) {
+        DatabaseService.getInstance().remove(TVContract.TVEntry.TABLE_NAME, id);
+
+        if (afterAction != null) {
+            afterAction.run();
+        }
+    }
+
+    @Override
+    public void update(Runnable afterAction) {
+        TV show = DatabaseService.getInstance().getTV(id);
+        if (show != null) {
+            show.update(afterAction);
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return DatabaseService.getInstance().contains(TVContract.TVEntry.TABLE_NAME, id);
     }
 
     public class Wrapper implements Serializable {

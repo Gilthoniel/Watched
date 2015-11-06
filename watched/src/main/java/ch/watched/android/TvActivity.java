@@ -23,7 +23,9 @@ import ch.watched.android.models.TV;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.ConnectionService;
 import ch.watched.android.service.ImageLoader;
+import ch.watched.android.service.utils.RequestCallback;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class TvActivity extends AppCompatActivity {
@@ -158,17 +160,31 @@ public class TvActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_remove:
 
-                DatabaseService.getInstance().remove(mTV);
+                mTV.remove(null);
                 finish();
                 return true;
 
             case R.id.action_refresh:
-
-                BaseWebService.instance.updateTV(mTV, new BaseWebService.Callable() {
+                BaseWebService.instance.getTV(mTV.getID(), new RequestCallback<TV>() {
                     @Override
-                    public void call() {
-                        recreate();
-                        Toast.makeText(getApplicationContext(), "TV Show updated!", Toast.LENGTH_SHORT).show();
+                    public void onSuccess(TV result) {
+                        result.update(new Runnable() {
+                            @Override
+                            public void run() {
+                                recreate();
+                                Toast.makeText(getApplicationContext(), "TV Show updated!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Errors error) {
+                        // TODO
+                    }
+
+                    @Override
+                    public Type getType() {
+                        return TV.class;
                     }
                 });
                 return true;

@@ -70,7 +70,7 @@ public class DiscoverFragment extends HomeFragment {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 mProgress.show();
-                mCurrent.insertIntoDatabase(new Runnable() {
+                mCurrent.insert(new Runnable() {
                     @Override
                     public void run() {
                         mAdapter.notifyDataSetChanged();
