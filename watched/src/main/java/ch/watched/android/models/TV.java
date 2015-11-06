@@ -8,11 +8,13 @@ import ch.watched.android.database.TVContract;
 import ch.watched.android.database.WatcherDbHelper;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.utils.RequestCallback;
+import ch.watched.android.service.utils.SimpleRequestCallback;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -123,33 +125,31 @@ public class TV implements Media, DatabaseItem, Serializable, Iterable<Episode> 
     /** DATABASE_ITEM implementation **/
 
     @Override
-    public void insert(Runnable afterAction) {
+    public void insert(final Runnable afterAction) {
         DatabaseService.getInstance().insert(TVContract.TVEntry.TABLE_NAME, getContentValues());
+        final List<Season> counter = new LinkedList<>();
         for (SeasonWrapper season : seasons) {
-            BaseWebService.instance.getSeason(id, season.season_number, new RequestCallback<Season>() {
+            BaseWebService.instance.getSeason(id, season.season_number, new SimpleRequestCallback<Season>(Season.class) {
                 @Override
-                public void onSuccess(Season result) {
+                public void onSuccess(final Season result) {
                     for (Episode episode : result.episodes) {
                         episode.setTV_ID(id);
                     }
 
-                    result.insert(null);
-                }
+                    result.insert(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (counter) {
+                                counter.add(result);
 
-                @Override
-                public void onFailure(Errors error) {
-                    // TODO
-                }
-
-                @Override
-                public Type getType() {
-                    return Season.class;
+                                if (counter.size() >= seasons.size() && afterAction != null) {
+                                    afterAction.run();
+                                }
+                            }
+                        }
+                    });
                 }
             });
-        }
-
-        if (afterAction != null) {
-            afterAction.run();
         }
     }
 
@@ -163,33 +163,30 @@ public class TV implements Media, DatabaseItem, Serializable, Iterable<Episode> 
     }
 
     @Override
-    public void update(Runnable afterAction) {
+    public void update(final Runnable afterAction) {
         DatabaseService.getInstance().update(TVContract.TVEntry.TABLE_NAME, getContentValues());
+        final List<Season> counter = new LinkedList<>();
         for (SeasonWrapper season : seasons) {
-            BaseWebService.instance.getSeason(id, season.season_number, new RequestCallback<Season>() {
+            BaseWebService.instance.getSeason(id, season.season_number, new SimpleRequestCallback<Season>(Season.class) {
                 @Override
-                public void onSuccess(Season result) {
+                public void onSuccess(final Season result) {
                     for (Episode episode : result.episodes) {
                         episode.setTV_ID(id);
                     }
 
-                    result.update(null);
-                }
-
-                @Override
-                public void onFailure(Errors error) {
-                    // TODO
-                }
-
-                @Override
-                public Type getType() {
-                    return Season.class;
+                    result.update(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (counter) {
+                                counter.add(result);
+                                if (counter.size() >= seasons.size() && afterAction != null) {
+                                    afterAction.run();
+                                }
+                            }
+                        }
+                    });
                 }
             });
-        }
-
-        if (afterAction != null) {
-            afterAction.run();
         }
     }
 

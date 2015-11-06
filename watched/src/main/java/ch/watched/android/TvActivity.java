@@ -24,6 +24,7 @@ import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.ConnectionService;
 import ch.watched.android.service.ImageLoader;
 import ch.watched.android.service.utils.RequestCallback;
+import ch.watched.android.service.utils.SimpleRequestCallback;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -91,7 +92,7 @@ public class TvActivity extends AppCompatActivity {
 
                 int itemType = ExpandableListView.getPackedPositionType(id);
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                    int group = ExpandableListView.getPackedPositionGroup(id) - 1;
+                    int group = ExpandableListView.getPackedPositionGroup(id);
 
                     boolean watched = mAdapter.containsUnwatchedChild(group);
                     for (int i = 0; i < mAdapter.getChildrenCount(group); i++) {
@@ -165,7 +166,7 @@ public class TvActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_refresh:
-                BaseWebService.instance.getTV(mTV.getID(), new RequestCallback<TV>() {
+                BaseWebService.instance.getTV(mTV.getID(), new SimpleRequestCallback<TV>(TV.class) {
                     @Override
                     public void onSuccess(TV result) {
                         result.update(new Runnable() {
@@ -175,16 +176,6 @@ public class TvActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "TV Show updated!", Toast.LENGTH_SHORT).show();
                             }
                         });
-                    }
-
-                    @Override
-                    public void onFailure(Errors error) {
-                        // TODO
-                    }
-
-                    @Override
-                    public Type getType() {
-                        return TV.class;
                     }
                 });
                 return true;

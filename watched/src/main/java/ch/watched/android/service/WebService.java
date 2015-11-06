@@ -26,9 +26,8 @@ public abstract class WebService {
      * POST HTTP request
      * @param builder query parameters
      * @param callback callback function
-     * @param <T> type of the return
      */
-    public <T> void post(Uri.Builder builder, RequestCallback<Boolean> callback) {
+    public void post(Uri.Builder builder, RequestCallback<Boolean> callback) {
 
         // POST request without caching
         ConnectionService.instance.executePostRequest(builder, callback);

@@ -180,7 +180,7 @@ public class PagerCardAdapter<U extends Media, T extends Media & Iterable<U>> ex
 
                 mOld = next;
             } else {
-                mMedias.remove(mMedia); // TODO
+                mMedias.remove(mMedia);
                 notifyDataSetChanged();
             }
         }

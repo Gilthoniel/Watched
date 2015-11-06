@@ -17,6 +17,7 @@ import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.GenreManager;
 import ch.watched.android.service.ImageLoader;
 import ch.watched.android.service.utils.RequestCallback;
+import ch.watched.android.service.utils.SimpleRequestCallback;
 
 import java.lang.reflect.Type;
 
@@ -118,7 +119,7 @@ public class MovieActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_refresh:
-                BaseWebService.instance.getMovie(mMovie.getID(), new RequestCallback<Movie>() {
+                BaseWebService.instance.getMovie(mMovie.getID(), new SimpleRequestCallback<Movie>(Movie.class) {
                     @Override
                     public void onSuccess(Movie result) {
                         result.update(new Runnable() {
@@ -128,16 +129,6 @@ public class MovieActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Movie updated!", Toast.LENGTH_SHORT).show();
                             }
                         });
-                    }
-
-                    @Override
-                    public void onFailure(Errors error) {
-                        // TODO
-                    }
-
-                    @Override
-                    public Type getType() {
-                        return Movie.class;
                     }
                 });
                 return true;

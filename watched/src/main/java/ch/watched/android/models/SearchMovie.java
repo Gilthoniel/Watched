@@ -6,6 +6,7 @@ import ch.watched.android.database.MovieContract;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.WebService;
 import ch.watched.android.service.utils.RequestCallback;
+import ch.watched.android.service.utils.SimpleRequestCallback;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -84,20 +85,10 @@ public class SearchMovie implements Media, DatabaseItem, Serializable {
 
     @Override
     public void insert(final Runnable afterAction) {
-        BaseWebService.instance.getMovie(id, new RequestCallback<Movie>() {
+        BaseWebService.instance.getMovie(id, new SimpleRequestCallback<Movie>(Movie.class) {
             @Override
             public void onSuccess(Movie result) {
                 result.insert(afterAction);
-            }
-
-            @Override
-            public void onFailure(Errors error) {
-                // TODO
-            }
-
-            @Override
-            public Type getType() {
-                return Movie.class;
             }
         });
     }

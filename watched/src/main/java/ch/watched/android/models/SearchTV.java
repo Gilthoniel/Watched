@@ -4,6 +4,7 @@ import ch.watched.android.database.DatabaseService;
 import ch.watched.android.database.TVContract;
 import ch.watched.android.service.BaseWebService;
 import ch.watched.android.service.utils.RequestCallback;
+import ch.watched.android.service.utils.SimpleRequestCallback;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -80,20 +81,10 @@ public class SearchTV implements Media, DatabaseItem, Serializable {
 
     @Override
     public void insert(final Runnable afterAction) {
-        BaseWebService.instance.getTV(id, new RequestCallback<TV>() {
+        BaseWebService.instance.getTV(id, new SimpleRequestCallback<TV>(TV.class) {
             @Override
             public void onSuccess(TV result) {
                 result.insert(afterAction);
-            }
-
-            @Override
-            public void onFailure(Errors error) {
-                // TODO
-            }
-
-            @Override
-            public Type getType() {
-                return TV.class;
             }
         });
     }

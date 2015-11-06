@@ -135,7 +135,7 @@ public class Episode implements Media, DatabaseItem, Serializable {
 
     @Override
     public String toString() {
-        return "Episode " + episode_number + ", Season" + season_number;
+        return "Episode " + episode_number + ", Season " + season_number;
     }
 
     private ContentValues getContentValues() {
